@@ -28,7 +28,6 @@ const plans = defineCollection({
   schema: z.object({
     // Basic info
     name: z.string(),
-    slug: z.string().optional(),
     summary: z.string().min(100).max(250),
 
     // Media
@@ -81,7 +80,6 @@ const modules = defineCollection({
   schema: z.object({
     // Basic info
     name: z.string(),
-    slug: z.string().optional(),
     icon: z.string(),
     summary: z.string(),
 
@@ -128,7 +126,6 @@ const resources = defineCollection({
   schema: z.object({
     // Basic info
     title: z.string(),
-    slug: z.string().optional(),
     category: resourceCategoryEnum,
     summary: z.string(), // 2-3 sentences
 

@@ -11,7 +11,7 @@ import type { CollectionEntry } from 'astro:content';
 export async function getStaticPaths() {
   const resources = await getCollection('resources');
   return resources.map((resource) => ({
-    params: { slug: resource.data.slug || resource.slug },
+    params: { slug: resource.slug },
     props: { resource }
   }));
 }
@@ -168,7 +168,7 @@ const relatedResources = allResources
                 {relatedPlans.map(plan => (
                   <li>
                     <a
-                      href={`/plans/${plan.data.slug || plan.slug}`}
+                      href={`/plans/${plan.slug}`}
                       class="flex items-center gap-3 text-stone-600 hover:text-forest-600 transition-colors"
                     >
                       <Icon name="home" size="sm" />
@@ -188,7 +188,7 @@ const relatedResources = allResources
                 {relatedModules.map(mod => (
                   <li>
                     <a
-                      href={`/modules/${mod.data.slug || mod.slug}`}
+                      href={`/modules/${mod.slug}`}
                       class="flex items-center gap-3 text-stone-600 hover:text-forest-600 transition-colors"
                     >
                       <Icon name={mod.data.icon} size="sm" />
@@ -208,7 +208,7 @@ const relatedResources = allResources
                 {relatedResources.map(res => (
                   <li>
                     <a
-                      href={`/resources/${res.data.slug || res.slug}`}
+                      href={`/resources/${res.slug}`}
                       class="flex items-center gap-3 text-stone-600 hover:text-forest-600 transition-colors"
                     >
                       <Icon name="book-open" size="sm" />

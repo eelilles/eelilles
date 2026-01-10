@@ -75,7 +75,6 @@ const categories = [...new Set(resources.map(r => r.data.category))];
     <Container>
       <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6" id="resources-grid">
         {resources.map((resource) => {
-          const slug = resource.data.slug || resource.slug;
           return (
             <article
               class="resource-card bg-white rounded-xl shadow-soft hover:shadow-lifted transition-shadow p-6 flex flex-col"
@@ -92,7 +91,7 @@ const categories = [...new Set(resources.map(r => r.data.category))];
               </div>
 
               <h3 class="text-lg font-semibold text-forest-900 mb-2">
-                <a href={`/resources/${slug}`} class="hover:text-forest-600 transition-colors">
+                <a href={`/resources/${resource.slug}`} class="hover:text-forest-600 transition-colors">
                   {resource.data.title}
                 </a>
               </h3>
@@ -103,7 +102,7 @@ const categories = [...new Set(resources.map(r => r.data.category))];
 
               <div class="flex items-center justify-between pt-4 border-t border-stone-100">
                 <a
-                  href={`/resources/${slug}`}
+                  href={`/resources/${resource.slug}`}
                   class="text-forest-600 font-medium text-sm hover:text-forest-700 transition-colors inline-flex items-center gap-1"
                 >
                   Read guide
