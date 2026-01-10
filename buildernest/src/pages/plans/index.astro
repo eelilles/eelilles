@@ -1,49 +1,455 @@
 ---
-import PageLayout from '@layouts/PageLayout.astro';
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Header from '@components/Header.astro';
+import Footer from '@components/Footer.astro';
 import Container from '@components/Container.astro';
-import Card from '@components/Card.astro';
+import Button from '@components/Button.astro';
 import Badge from '@components/Badge.astro';
+import Icon from '@components/Icon.astro';
+import SectionHeading from '@components/SectionHeading.astro';
 import { getCollection } from 'astro:content';
 
-const plans = await getCollection('plans', ({ data }) => !data.draft);
+const allPlans = await getCollection('plans', ({ data }) => !data.draft);
+
+// Sort: featured first, then by floor area descending
+const plans = allPlans.sort((a, b) => {
+  if (a.data.featured !== b.data.featured) return b.data.featured ? 1 : -1;
+  return b.data.floorArea - a.data.floorArea;
+});
+
+// Get unique values for filters
+const allClimates = [...new Set(plans.flatMap(p => p.data.climateFit))];
+const allFoundations = [...new Set(plans.flatMap(p => p.data.foundationOptions))];
+
+// Helper to get size band
+function getSizeBand(sqft: number): string {
+  if (sqft < 600) return 'tiny';
+  if (sqft < 1000) return 'small';
+  if (sqft < 1500) return 'medium';
+  return 'larger';
+}
+
+// Climate display names
+const climateLabels: Record<string, string> = {
+  coastal: 'Coastal',
+  interior: 'Interior',
+  northern: 'Northern',
+  alpine: 'Alpine'
+};
+
+// Foundation display names
+const foundationLabels: Record<string, string> = {
+  slab: 'Slab',
+  crawlspace: 'Crawlspace',
+  basement: 'Basement',
+  piers: 'Piers/Posts'
+};
 ---
 
-<PageLayout
-  title="Plans"
-  description="Browse housing plans for northern BC"
-  heroTitle="Plans"
-  heroSubtitle="Browse available housing plans designed for northern BC conditions"
-  showCtaBand={true}
-  ctaTitle="Need a custom plan?"
-  ctaSubtitle="Contact us to discuss your specific requirements and site conditions."
-  ctaButtonText="Contact Us"
-  ctaButtonHref="/contact"
-  showFooterCta={false}
+<BaseLayout
+  title="Plans Library"
+  description="Browse our curated collection of housing plans designed for northern BC conditions. Filter by size, bedrooms, foundation type, and climate."
 >
-  <section class="py-12 md:py-16">
-    <Container>
-      {plans.length > 0 ? (
-        <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {plans.map((plan) => (
-            <Card href={`/plans/${plan.slug}`}>
-              <h3 class="text-stone-900">{plan.data.title}</h3>
-              <p class="mt-2 text-sm text-stone-600">{plan.data.description}</p>
-              {(plan.data.squareFeet || plan.data.bedrooms) && (
-                <div class="mt-4 flex flex-wrap gap-2">
-                  {plan.data.squareFeet && (
-                    <Badge>{plan.data.squareFeet} sq ft</Badge>
-                  )}
-                  {plan.data.bedrooms && (
-                    <Badge>{plan.data.bedrooms} bed</Badge>
-                  )}
+  <div class="flex min-h-screen flex-col">
+    <Header />
+
+    <main class="flex-1">
+      <!-- Hero -->
+      <section class="bg-cream-100 border-b border-stone-200 py-12 md:py-16">
+        <Container>
+          <div class="max-w-2xl">
+            <h1 class="text-stone-900">Plans Library</h1>
+            <p class="mt-4 text-lg text-stone-600">
+              Curated housing plans designed for real BC conditions. Each plan includes
+              structured documentation for clearer bidding and better builds.
+            </p>
+          </div>
+        </Container>
+      </section>
+
+      <!-- Main content -->
+      <section class="py-12 md:py-16">
+        <Container>
+          <div class="lg:grid lg:grid-cols-4 lg:gap-8">
+            <!-- Filter Sidebar -->
+            <aside class="lg:col-span-1 mb-8 lg:mb-0">
+              <div class="lg:sticky lg:top-24">
+                <div class="flex items-center justify-between mb-4">
+                  <h2 class="text-lg font-semibold text-stone-900">Filters</h2>
+                  <button
+                    type="button"
+                    id="clear-filters"
+                    class="text-sm text-forest-600 hover:text-forest-700 hidden"
+                  >
+                    Clear all
+                  </button>
+                </div>
+
+                <div class="space-y-6">
+                  <!-- Size Band -->
+                  <fieldset>
+                    <legend class="text-sm font-medium text-stone-700 mb-2">Size</legend>
+                    <div class="space-y-2">
+                      <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" name="size" value="tiny" class="filter-checkbox rounded border-stone-300 text-forest-600 focus:ring-forest-500" />
+                        <span class="text-sm text-stone-600">Tiny (&lt;600 sq ft)</span>
+                      </label>
+                      <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" name="size" value="small" class="filter-checkbox rounded border-stone-300 text-forest-600 focus:ring-forest-500" />
+                        <span class="text-sm text-stone-600">Small (600-999 sq ft)</span>
+                      </label>
+                      <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" name="size" value="medium" class="filter-checkbox rounded border-stone-300 text-forest-600 focus:ring-forest-500" />
+                        <span class="text-sm text-stone-600">Medium (1000-1499 sq ft)</span>
+                      </label>
+                      <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" name="size" value="larger" class="filter-checkbox rounded border-stone-300 text-forest-600 focus:ring-forest-500" />
+                        <span class="text-sm text-stone-600">Larger (1500+ sq ft)</span>
+                      </label>
+                    </div>
+                  </fieldset>
+
+                  <!-- Bedrooms -->
+                  <fieldset>
+                    <legend class="text-sm font-medium text-stone-700 mb-2">Bedrooms</legend>
+                    <div class="flex flex-wrap gap-2">
+                      {[0, 1, 2, 3, 4].map((num) => (
+                        <label class="cursor-pointer">
+                          <input type="checkbox" name="bedrooms" value={num} class="filter-checkbox sr-only peer" />
+                          <span class="inline-flex items-center justify-center w-10 h-10 rounded-lg border border-stone-200 text-sm font-medium text-stone-600 peer-checked:bg-forest-600 peer-checked:text-white peer-checked:border-forest-600 hover:border-forest-300 transition-colors">
+                            {num === 4 ? '4+' : num}
+                          </span>
+                        </label>
+                      ))}
+                    </div>
+                  </fieldset>
+
+                  <!-- Foundation -->
+                  <fieldset>
+                    <legend class="text-sm font-medium text-stone-700 mb-2">Foundation</legend>
+                    <div class="space-y-2">
+                      {allFoundations.map((foundation) => (
+                        <label class="flex items-center gap-2 cursor-pointer">
+                          <input type="checkbox" name="foundation" value={foundation} class="filter-checkbox rounded border-stone-300 text-forest-600 focus:ring-forest-500" />
+                          <span class="text-sm text-stone-600">{foundationLabels[foundation]}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </fieldset>
+
+                  <!-- Climate Fit -->
+                  <fieldset>
+                    <legend class="text-sm font-medium text-stone-700 mb-2">Climate Fit</legend>
+                    <div class="space-y-2">
+                      {allClimates.map((climate) => (
+                        <label class="flex items-center gap-2 cursor-pointer">
+                          <input type="checkbox" name="climate" value={climate} class="filter-checkbox rounded border-stone-300 text-forest-600 focus:ring-forest-500" />
+                          <span class="text-sm text-stone-600">{climateLabels[climate]}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </fieldset>
+
+                  <!-- Off-grid -->
+                  <fieldset>
+                    <legend class="text-sm font-medium text-stone-700 mb-2">Features</legend>
+                    <label class="flex items-center gap-2 cursor-pointer">
+                      <input type="checkbox" name="offgrid" value="true" class="filter-checkbox rounded border-stone-300 text-forest-600 focus:ring-forest-500" id="offgrid-filter" />
+                      <span class="text-sm text-stone-600">Off-grid friendly</span>
+                    </label>
+                  </fieldset>
+                </div>
+
+                <!-- Mobile filter toggle -->
+                <button
+                  type="button"
+                  class="lg:hidden fixed bottom-4 right-4 z-40 flex items-center gap-2 bg-forest-700 text-white px-4 py-3 rounded-full shadow-lg hover:bg-forest-800 transition-colors"
+                  id="mobile-filter-toggle"
+                >
+                  <Icon name="adjustments" size="md" />
+                  <span class="font-medium">Filters</span>
+                </button>
+              </div>
+            </aside>
+
+            <!-- Plan Grid -->
+            <div class="lg:col-span-3">
+              <!-- Results count -->
+              <div class="flex items-center justify-between mb-6">
+                <p class="text-sm text-stone-600">
+                  <span id="results-count">{plans.length}</span> plans
+                </p>
+              </div>
+
+              <!-- No results message -->
+              <div id="no-results" class="hidden text-center py-12">
+                <div class="flex items-center justify-center w-16 h-16 mx-auto rounded-full bg-stone-100 text-stone-400 mb-4">
+                  <Icon name="search" size="xl" />
+                </div>
+                <h3 class="text-lg font-medium text-stone-900 mb-2">No plans match your filters</h3>
+                <p class="text-stone-600 mb-4">Try adjusting your filter criteria</p>
+                <button type="button" id="clear-filters-empty" class="text-forest-600 hover:text-forest-700 font-medium">
+                  Clear all filters
+                </button>
+              </div>
+
+              <!-- Plan cards grid -->
+              <div id="plans-grid" class="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+                {plans.map((plan) => (
+                  <a
+                    href={`/plans/${plan.slug}`}
+                    class="plan-card group block rounded-xl bg-white border border-stone-200 overflow-hidden transition-all duration-200 hover:shadow-lifted hover:-translate-y-0.5 no-underline"
+                    data-size={getSizeBand(plan.data.floorArea)}
+                    data-bedrooms={plan.data.bedrooms}
+                    data-foundations={plan.data.foundationOptions.join(',')}
+                    data-climates={plan.data.climateFit.join(',')}
+                    data-offgrid={plan.data.offgridFriendly}
+                  >
+                    <!-- Image -->
+                    <div class="aspect-[4/3] bg-stone-100 relative overflow-hidden">
+                      {plan.data.heroImage ? (
+                        <img src={plan.data.heroImage} alt={plan.data.name} class="w-full h-full object-cover" />
+                      ) : (
+                        <div class="absolute inset-0 flex items-center justify-center">
+                          <svg class="w-16 h-16 text-stone-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                          </svg>
+                        </div>
+                      )}
+                      {plan.data.featured && (
+                        <div class="absolute top-3 left-3">
+                          <Badge variant="amber" size="sm">Featured</Badge>
+                        </div>
+                      )}
+                      {plan.data.offgridFriendly && (
+                        <div class="absolute top-3 right-3">
+                          <Badge variant="forest" size="sm">Off-grid</Badge>
+                        </div>
+                      )}
+                    </div>
+
+                    <!-- Content -->
+                    <div class="p-5">
+                      <h3 class="text-lg font-semibold text-stone-900 group-hover:text-forest-700 transition-colors">
+                        {plan.data.name}
+                      </h3>
+
+                      <!-- Specs -->
+                      <div class="mt-2 flex items-center gap-3 text-sm text-stone-600">
+                        <span>{plan.data.floorArea.toLocaleString()} sq ft</span>
+                        <span class="text-stone-300">·</span>
+                        <span>{plan.data.bedrooms} bed{plan.data.bedrooms !== 1 && 's'}</span>
+                        <span class="text-stone-300">·</span>
+                        <span>{plan.data.bathrooms} bath{plan.data.bathrooms !== 1 && 's'}</span>
+                      </div>
+
+                      <!-- Summary -->
+                      <p class="mt-3 text-sm text-stone-600 line-clamp-2">
+                        {plan.data.summary}
+                      </p>
+
+                      <!-- Tags -->
+                      {plan.data.styleTags.length > 0 && (
+                        <div class="mt-3 flex flex-wrap gap-1.5">
+                          {plan.data.styleTags.slice(0, 3).map((tag) => (
+                            <Badge size="sm" variant="outline">{tag}</Badge>
+                          ))}
+                        </div>
+                      )}
+
+                      <!-- View link -->
+                      <div class="mt-4 flex items-center gap-1 text-sm font-medium text-forest-600 group-hover:text-forest-700">
+                        <span>View plan</span>
+                        <svg class="w-4 h-4 transition-transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                      </div>
+                    </div>
+                  </a>
+                ))}
+              </div>
+
+              <!-- Empty state when no plans exist -->
+              {plans.length === 0 && (
+                <div class="text-center py-12">
+                  <p class="text-stone-500">No plans available yet. Check back soon!</p>
                 </div>
               )}
-            </Card>
-          ))}
-        </div>
-      ) : (
-        <p class="text-stone-500">No plans available yet.</p>
-      )}
-    </Container>
-  </section>
-</PageLayout>
+            </div>
+          </div>
+        </Container>
+      </section>
+
+      <!-- CTA Band -->
+      <section class="py-16 md:py-20 bg-forest-800">
+        <Container>
+          <div class="max-w-2xl mx-auto text-center">
+            <h2 class="text-2xl md:text-3xl font-bold text-white">
+              Need a custom plan?
+            </h2>
+            <p class="mt-4 text-lg text-forest-200">
+              Contact us to discuss your specific requirements and site conditions.
+            </p>
+            <div class="mt-8 flex flex-col sm:flex-row justify-center gap-4">
+              <Button href="/contact" variant="secondary" size="lg">
+                Request Custom Plan
+              </Button>
+              <Button href="/how-it-works" variant="outline" size="lg" class="text-white border-forest-400 hover:bg-forest-700">
+                Learn How It Works
+              </Button>
+            </div>
+          </div>
+        </Container>
+      </section>
+    </main>
+
+    <Footer showCta={false} />
+  </div>
+</BaseLayout>
+
+<script>
+  // Client-side filtering
+  document.addEventListener('DOMContentLoaded', () => {
+    const planCards = document.querySelectorAll<HTMLElement>('.plan-card');
+    const filterCheckboxes = document.querySelectorAll<HTMLInputElement>('.filter-checkbox');
+    const resultsCount = document.getElementById('results-count');
+    const noResults = document.getElementById('no-results');
+    const plansGrid = document.getElementById('plans-grid');
+    const clearFiltersBtn = document.getElementById('clear-filters');
+    const clearFiltersEmptyBtn = document.getElementById('clear-filters-empty');
+
+    function getActiveFilters() {
+      const filters: Record<string, string[]> = {
+        size: [],
+        bedrooms: [],
+        foundation: [],
+        climate: [],
+        offgrid: []
+      };
+
+      filterCheckboxes.forEach((checkbox) => {
+        if (checkbox.checked) {
+          const name = checkbox.name;
+          filters[name].push(checkbox.value);
+        }
+      });
+
+      return filters;
+    }
+
+    function filterPlans() {
+      const filters = getActiveFilters();
+      const hasActiveFilters = Object.values(filters).some(arr => arr.length > 0);
+      let visibleCount = 0;
+
+      planCards.forEach((card) => {
+        const cardSize = card.dataset.size || '';
+        const cardBedrooms = card.dataset.bedrooms || '';
+        const cardFoundations = (card.dataset.foundations || '').split(',');
+        const cardClimates = (card.dataset.climates || '').split(',');
+        const cardOffgrid = card.dataset.offgrid === 'true';
+
+        let visible = true;
+
+        // Size filter
+        if (filters.size.length > 0 && !filters.size.includes(cardSize)) {
+          visible = false;
+        }
+
+        // Bedrooms filter
+        if (filters.bedrooms.length > 0) {
+          const bedCount = parseInt(cardBedrooms);
+          const matchesBedrooms = filters.bedrooms.some(b => {
+            const filterBed = parseInt(b);
+            if (filterBed === 4) return bedCount >= 4;
+            return bedCount === filterBed;
+          });
+          if (!matchesBedrooms) visible = false;
+        }
+
+        // Foundation filter
+        if (filters.foundation.length > 0) {
+          const hasMatchingFoundation = filters.foundation.some(f => cardFoundations.includes(f));
+          if (!hasMatchingFoundation) visible = false;
+        }
+
+        // Climate filter
+        if (filters.climate.length > 0) {
+          const hasMatchingClimate = filters.climate.some(c => cardClimates.includes(c));
+          if (!hasMatchingClimate) visible = false;
+        }
+
+        // Off-grid filter
+        if (filters.offgrid.length > 0 && !cardOffgrid) {
+          visible = false;
+        }
+
+        card.style.display = visible ? 'block' : 'none';
+        if (visible) visibleCount++;
+      });
+
+      // Update count
+      if (resultsCount) {
+        resultsCount.textContent = visibleCount.toString();
+      }
+
+      // Show/hide no results message
+      if (noResults && plansGrid) {
+        if (visibleCount === 0 && planCards.length > 0) {
+          noResults.classList.remove('hidden');
+          plansGrid.classList.add('hidden');
+        } else {
+          noResults.classList.add('hidden');
+          plansGrid.classList.remove('hidden');
+        }
+      }
+
+      // Show/hide clear button
+      if (clearFiltersBtn) {
+        if (hasActiveFilters) {
+          clearFiltersBtn.classList.remove('hidden');
+        } else {
+          clearFiltersBtn.classList.add('hidden');
+        }
+      }
+    }
+
+    function clearFilters() {
+      filterCheckboxes.forEach((checkbox) => {
+        checkbox.checked = false;
+      });
+      filterPlans();
+    }
+
+    // Event listeners
+    filterCheckboxes.forEach((checkbox) => {
+      checkbox.addEventListener('change', filterPlans);
+    });
+
+    clearFiltersBtn?.addEventListener('click', clearFilters);
+    clearFiltersEmptyBtn?.addEventListener('click', clearFilters);
+
+    // Mobile filter toggle
+    const mobileFilterToggle = document.getElementById('mobile-filter-toggle');
+    const filterSidebar = document.querySelector('aside');
+
+    mobileFilterToggle?.addEventListener('click', () => {
+      filterSidebar?.classList.toggle('hidden');
+      filterSidebar?.classList.toggle('fixed');
+      filterSidebar?.classList.toggle('inset-0');
+      filterSidebar?.classList.toggle('z-50');
+      filterSidebar?.classList.toggle('bg-white');
+      filterSidebar?.classList.toggle('p-6');
+      filterSidebar?.classList.toggle('overflow-auto');
+    });
+  });
+</script>
+
+<style>
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+</style>

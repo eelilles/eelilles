@@ -1,7 +1,12 @@
 ---
-import PageLayout from '@layouts/PageLayout.astro';
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Header from '@components/Header.astro';
+import Footer from '@components/Footer.astro';
 import Container from '@components/Container.astro';
+import Button from '@components/Button.astro';
 import Badge from '@components/Badge.astro';
+import Card from '@components/Card.astro';
+import Icon from '@components/Icon.astro';
 import { getCollection } from 'astro:content';
 import type { CollectionEntry } from 'astro:content';
 
@@ -19,38 +24,386 @@ interface Props {
 
 const { plan } = Astro.props;
 const { Content } = await plan.render();
+
+// Get related modules
+const allModules = await getCollection('modules', ({ data }) => !data.draft);
+const recommendedModules = allModules.filter(m =>
+  plan.data.recommendedModules.includes(m.slug)
+);
+
+// Helper labels
+const planTypeLabels: Record<string, string> = {
+  cabin: 'Cabin',
+  small_home: 'Small Home',
+  adu: 'ADU',
+  duplex: 'Duplex'
+};
+
+const foundationLabels: Record<string, string> = {
+  slab: 'Slab',
+  crawlspace: 'Crawlspace',
+  basement: 'Basement',
+  piers: 'Piers/Posts'
+};
+
+const climateLabels: Record<string, string> = {
+  coastal: 'Coastal BC',
+  interior: 'Interior BC',
+  northern: 'Northern BC',
+  alpine: 'Alpine/Mountain'
+};
+
+const resilienceLabels: Record<string, string> = {
+  baseline: 'Baseline',
+  enhanced: 'Enhanced',
+  resilient_plus: 'Resilient+'
+};
+
+// Build "Best for" tags
+const bestForTags = [
+  ...plan.data.climateFit.map(c => climateLabels[c]),
+  planTypeLabels[plan.data.planType],
+  ...(plan.data.offgridFriendly ? ['Off-grid ready'] : []),
+  ...plan.data.resilienceTier.filter(r => r !== 'baseline').map(r => resilienceLabels[r])
+];
+
+// Gallery images (hero + gallery)
+const galleryImages = [
+  plan.data.heroImage,
+  ...plan.data.gallery
+].filter(Boolean) as string[];
 ---
 
-<PageLayout title={plan.data.title} description={plan.data.description}>
-  <article class="py-16">
-    <Container size="md">
-      <header class="mb-12">
-        <h1 class="text-stone-900">{plan.data.title}</h1>
-        <p class="mt-4 text-lg text-stone-600">{plan.data.description}</p>
-        {(plan.data.squareFeet || plan.data.bedrooms || plan.data.bathrooms) && (
-          <div class="mt-6 flex flex-wrap gap-3">
-            {plan.data.squareFeet && (
-              <Badge size="md" variant="forest">{plan.data.squareFeet} sq ft</Badge>
-            )}
-            {plan.data.bedrooms && (
-              <Badge size="md" variant="forest">{plan.data.bedrooms} bedrooms</Badge>
-            )}
-            {plan.data.bathrooms && (
-              <Badge size="md" variant="forest">{plan.data.bathrooms} bathrooms</Badge>
+<BaseLayout
+  title={plan.data.name}
+  description={plan.data.summary}
+  image={plan.data.heroImage}
+>
+  <div class="flex min-h-screen flex-col">
+    <Header />
+
+    <main class="flex-1">
+      <!-- Image Gallery Section -->
+      <section class="bg-stone-100">
+        <Container size="xl">
+          <div class="py-6 md:py-8">
+            {galleryImages.length > 0 ? (
+              <div class="grid gap-4 md:grid-cols-3 md:grid-rows-2">
+                <!-- Main hero image -->
+                <div class="md:col-span-2 md:row-span-2">
+                  <div class="aspect-[4/3] md:aspect-auto md:h-full rounded-xl overflow-hidden bg-stone-200">
+                    <img
+                      src={galleryImages[0]}
+                      alt={plan.data.name}
+                      class="w-full h-full object-cover"
+                      id="main-gallery-image"
+                    />
+                  </div>
+                </div>
+                <!-- Thumbnail grid -->
+                {galleryImages.slice(1, 5).map((img, i) => (
+                  <div class="hidden md:block">
+                    <button
+                      type="button"
+                      class="gallery-thumb w-full aspect-[4/3] rounded-lg overflow-hidden bg-stone-200 hover:ring-2 hover:ring-forest-500 focus:ring-2 focus:ring-forest-500 transition-all"
+                      data-src={img}
+                    >
+                      <img src={img} alt="" class="w-full h-full object-cover" />
+                    </button>
+                  </div>
+                ))}
+                <!-- Placeholder thumbnails if needed -->
+                {galleryImages.length < 5 && Array.from({ length: Math.max(0, 4 - galleryImages.length + 1) }).map((_, i) => (
+                  <div class="hidden md:block aspect-[4/3] rounded-lg bg-stone-200 flex items-center justify-center">
+                    <Icon name="home" size="xl" class="text-stone-400" />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <!-- Placeholder when no images -->
+              <div class="aspect-[16/9] md:aspect-[21/9] rounded-xl bg-stone-200 flex items-center justify-center">
+                <div class="text-center">
+                  <Icon name="home" size="xl" class="text-stone-400 mx-auto mb-2" />
+                  <span class="text-stone-500">Plan images coming soon</span>
+                </div>
+              </div>
             )}
           </div>
-        )}
-        {plan.data.tags && plan.data.tags.length > 0 && (
-          <div class="mt-4 flex flex-wrap gap-2">
-            {plan.data.tags.map((tag) => (
-              <Badge variant="outline">{tag}</Badge>
-            ))}
+        </Container>
+      </section>
+
+      <!-- Plan Content -->
+      <section class="py-12 md:py-16">
+        <Container>
+          <div class="lg:grid lg:grid-cols-3 lg:gap-12">
+            <!-- Main Content -->
+            <div class="lg:col-span-2">
+              <!-- Header -->
+              <header>
+                <div class="flex flex-wrap items-center gap-3 mb-4">
+                  <Badge variant="forest">{planTypeLabels[plan.data.planType]}</Badge>
+                  {plan.data.featured && <Badge variant="amber">Featured</Badge>}
+                  {plan.data.offgridFriendly && <Badge variant="outline">Off-grid friendly</Badge>}
+                </div>
+
+                <h1 class="text-3xl md:text-4xl font-bold text-stone-900">
+                  {plan.data.name}
+                </h1>
+
+                <p class="mt-4 text-lg text-stone-600">
+                  {plan.data.summary}
+                </p>
+              </header>
+
+              <!-- Stats Bar -->
+              <div class="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 bg-cream-50 rounded-xl border border-stone-200">
+                <div class="text-center">
+                  <div class="text-2xl font-bold text-stone-900">{plan.data.floorArea.toLocaleString()}</div>
+                  <div class="text-sm text-stone-600">sq ft</div>
+                </div>
+                <div class="text-center">
+                  <div class="text-2xl font-bold text-stone-900">{plan.data.bedrooms}</div>
+                  <div class="text-sm text-stone-600">bedroom{plan.data.bedrooms !== 1 && 's'}</div>
+                </div>
+                <div class="text-center">
+                  <div class="text-2xl font-bold text-stone-900">{plan.data.bathrooms}</div>
+                  <div class="text-sm text-stone-600">bathroom{plan.data.bathrooms !== 1 && 's'}</div>
+                </div>
+                <div class="text-center">
+                  <div class="text-2xl font-bold text-stone-900">{plan.data.stories}</div>
+                  <div class="text-sm text-stone-600">stor{plan.data.stories === 1 ? 'y' : 'ies'}</div>
+                </div>
+              </div>
+
+              <!-- Best For Tags -->
+              {bestForTags.length > 0 && (
+                <div class="mt-6">
+                  <h3 class="text-sm font-medium text-stone-700 mb-2">Best for</h3>
+                  <div class="flex flex-wrap gap-2">
+                    {bestForTags.map((tag) => (
+                      <Badge variant="outline">{tag}</Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <!-- Description -->
+              <div class="mt-10">
+                <h2 class="text-xl font-semibold text-stone-900 mb-4">About this plan</h2>
+                <div class="prose prose-stone max-w-none">
+                  <Content />
+                </div>
+              </div>
+
+              <!-- What You Get (Public Inclusions) -->
+              {plan.data.publicInclusions && (
+                <div class="mt-10">
+                  <h2 class="text-xl font-semibold text-stone-900 mb-4">What you get</h2>
+                  <div class="p-6 bg-forest-50 rounded-xl border border-forest-100">
+                    <div class="prose prose-stone max-w-none prose-li:marker:text-forest-600">
+                      <Fragment set:html={plan.data.publicInclusions.split('\n').map(line =>
+                        line.startsWith('- ') ? `<li>${line.slice(2)}</li>` : `<p>${line}</p>`
+                      ).join('')} />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <!-- Options Section -->
+              <div class="mt-10">
+                <h2 class="text-xl font-semibold text-stone-900 mb-4">Foundation options</h2>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  {plan.data.foundationOptions.map((foundation) => (
+                    <div class="p-4 bg-white rounded-lg border border-stone-200 text-center">
+                      <Icon name="home" size="lg" class="text-forest-600 mx-auto mb-2" />
+                      <span class="text-sm font-medium text-stone-700">{foundationLabels[foundation]}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <!-- Style Tags -->
+              {plan.data.styleTags.length > 0 && (
+                <div class="mt-10">
+                  <h2 class="text-xl font-semibold text-stone-900 mb-4">Style</h2>
+                  <div class="flex flex-wrap gap-2">
+                    {plan.data.styleTags.map((tag) => (
+                      <Badge variant="outline" size="md">{tag}</Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <!-- Recommended Modules -->
+              {recommendedModules.length > 0 && (
+                <div class="mt-10">
+                  <h2 class="text-xl font-semibold text-stone-900 mb-4">Recommended modules</h2>
+                  <div class="grid gap-4 sm:grid-cols-2">
+                    {recommendedModules.map((module) => (
+                      <Card href={`/modules/${module.slug}`} padding="md">
+                        <h3 class="font-medium text-stone-900">{module.data.title}</h3>
+                        <p class="mt-1 text-sm text-stone-600 line-clamp-2">{module.data.description}</p>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <!-- FAQ Accordion -->
+              {plan.data.faq && plan.data.faq.length > 0 && (
+                <div class="mt-10">
+                  <h2 class="text-xl font-semibold text-stone-900 mb-4">Frequently asked questions</h2>
+                  <div class="space-y-3">
+                    {plan.data.faq.map((item, i) => (
+                      <details class="group bg-white rounded-lg border border-stone-200 overflow-hidden">
+                        <summary class="flex items-center justify-between p-4 cursor-pointer list-none hover:bg-stone-50 transition-colors">
+                          <span class="font-medium text-stone-900">{item.question}</span>
+                          <Icon name="arrow-right" size="md" class="text-stone-400 rotate-90 group-open:rotate-[-90deg] transition-transform" />
+                        </summary>
+                        <div class="px-4 pb-4 text-stone-600">
+                          {item.answer}
+                        </div>
+                      </details>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <!-- Disclaimer -->
+              <div class="mt-10 p-4 bg-stone-50 rounded-lg border border-stone-200">
+                <p class="text-sm text-stone-500">
+                  <strong class="text-stone-700">Note:</strong> All plans should be reviewed by a licensed
+                  professional before construction. Local building codes and site conditions may require
+                  modifications. Pricing and availability subject to change.
+                </p>
+              </div>
+            </div>
+
+            <!-- Sidebar -->
+            <aside class="lg:col-span-1 mt-10 lg:mt-0">
+              <div class="lg:sticky lg:top-24 space-y-6">
+                <!-- CTA Card -->
+                <div class="p-6 bg-white rounded-xl border border-stone-200 shadow-soft">
+                  <h3 class="font-semibold text-stone-900 mb-4">Interested in this plan?</h3>
+                  <div class="space-y-3">
+                    <Button href="/contact" variant="primary" size="lg" fullWidth>
+                      Start This Plan
+                    </Button>
+                    <Button href="/portal" variant="outline" size="lg" fullWidth>
+                      Request Portal Access
+                    </Button>
+                  </div>
+                  <p class="mt-4 text-xs text-stone-500 text-center">
+                    Portal access includes detailed specs, bid packages, and builder tools.
+                  </p>
+                </div>
+
+                <!-- Quick Specs Card -->
+                <div class="p-6 bg-cream-50 rounded-xl border border-stone-200">
+                  <h3 class="font-semibold text-stone-900 mb-4">Quick specs</h3>
+                  <dl class="space-y-3 text-sm">
+                    <div class="flex justify-between">
+                      <dt class="text-stone-600">Floor area</dt>
+                      <dd class="font-medium text-stone-900">{plan.data.floorArea.toLocaleString()} sq ft</dd>
+                    </div>
+                    <div class="flex justify-between">
+                      <dt class="text-stone-600">Bedrooms</dt>
+                      <dd class="font-medium text-stone-900">{plan.data.bedrooms}</dd>
+                    </div>
+                    <div class="flex justify-between">
+                      <dt class="text-stone-600">Bathrooms</dt>
+                      <dd class="font-medium text-stone-900">{plan.data.bathrooms}</dd>
+                    </div>
+                    <div class="flex justify-between">
+                      <dt class="text-stone-600">Stories</dt>
+                      <dd class="font-medium text-stone-900">{plan.data.stories}</dd>
+                    </div>
+                    <div class="flex justify-between">
+                      <dt class="text-stone-600">Type</dt>
+                      <dd class="font-medium text-stone-900">{planTypeLabels[plan.data.planType]}</dd>
+                    </div>
+                    <div class="flex justify-between">
+                      <dt class="text-stone-600">Off-grid</dt>
+                      <dd class="font-medium text-stone-900">{plan.data.offgridFriendly ? 'Yes' : 'No'}</dd>
+                    </div>
+                  </dl>
+                </div>
+
+                <!-- Climate Fit -->
+                <div class="p-6 bg-white rounded-xl border border-stone-200">
+                  <h3 class="font-semibold text-stone-900 mb-3">Climate fit</h3>
+                  <div class="flex flex-wrap gap-2">
+                    {plan.data.climateFit.map((climate) => (
+                      <Badge variant="forest" size="sm">{climateLabels[climate]}</Badge>
+                    ))}
+                  </div>
+                </div>
+
+                <!-- Back to plans -->
+                <a
+                  href="/plans"
+                  class="flex items-center gap-2 text-sm font-medium text-forest-600 hover:text-forest-700 no-underline"
+                >
+                  <svg class="w-4 h-4 rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                  </svg>
+                  Back to all plans
+                </a>
+              </div>
+            </aside>
           </div>
-        )}
-      </header>
-      <div class="prose max-w-none">
-        <Content />
-      </div>
-    </Container>
-  </article>
-</PageLayout>
+        </Container>
+      </section>
+
+      <!-- Bottom CTA -->
+      <section class="py-16 md:py-20 bg-cream-100 border-t border-stone-200">
+        <Container>
+          <div class="max-w-2xl mx-auto text-center">
+            <h2 class="text-2xl md:text-3xl font-bold text-stone-900">
+              Ready to build {plan.data.name}?
+            </h2>
+            <p class="mt-4 text-lg text-stone-600">
+              Get started with portal access for detailed specs, bid packages, and builder coordination.
+            </p>
+            <div class="mt-8 flex flex-col sm:flex-row justify-center gap-4">
+              <Button href="/contact" variant="primary" size="lg">
+                Start This Plan
+              </Button>
+              <Button href="/plans" variant="outline" size="lg">
+                Browse Other Plans
+              </Button>
+            </div>
+          </div>
+        </Container>
+      </section>
+    </main>
+
+    <Footer showCta={false} />
+  </div>
+</BaseLayout>
+
+<script>
+  // Gallery image switching
+  document.addEventListener('DOMContentLoaded', () => {
+    const mainImage = document.getElementById('main-gallery-image') as HTMLImageElement | null;
+    const thumbs = document.querySelectorAll<HTMLButtonElement>('.gallery-thumb');
+
+    thumbs.forEach((thumb) => {
+      thumb.addEventListener('click', () => {
+        const newSrc = thumb.dataset.src;
+        if (mainImage && newSrc) {
+          mainImage.src = newSrc;
+        }
+      });
+    });
+  });
+</script>
+
+<style>
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+</style>
