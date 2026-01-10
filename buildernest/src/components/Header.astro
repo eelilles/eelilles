@@ -1,61 +1,41 @@
 ---
 import Container from './Container.astro';
+import Logo from './Logo.astro';
+import Button from './Button.astro';
 
 const navItems = [
-  { href: '/', label: 'Home' },
   { href: '/plans', label: 'Plans' },
   { href: '/modules', label: 'Modules' },
-  { href: '/resources', label: 'Resources' }
+  { href: '/how-it-works', label: 'How it Works' },
+  { href: '/resources', label: 'Resources' },
+  { href: '/about', label: 'About' }
 ];
 
 const currentPath = Astro.url.pathname;
+
+function isActive(href: string): boolean {
+  if (href === '/') return currentPath === '/';
+  return currentPath.startsWith(href);
+}
 ---
 
-<header class="border-b border-stone-200 bg-white">
+<header class="sticky top-0 z-50 border-b border-stone-200 bg-white/95 backdrop-blur-sm">
   <Container as="nav">
-    <div class="flex h-16 items-center justify-between">
-      <a href="/" class="text-xl font-bold text-forest-800 no-underline hover:text-forest-600 transition-colors">
-        BuilderNest
+    <div class="flex h-16 items-center justify-between gap-4">
+      <!-- Logo -->
+      <a href="/" class="flex-shrink-0 no-underline">
+        <Logo size="md" />
       </a>
-      <ul class="hidden items-center gap-8 sm:flex">
+
+      <!-- Desktop Navigation -->
+      <ul class="hidden items-center gap-1 lg:flex">
         {navItems.map((item) => (
           <li>
             <a
               href={item.href}
               class:list={[
-                'text-sm font-medium no-underline transition-colors',
-                currentPath === item.href
-                  ? 'text-forest-700'
-                  : 'text-stone-600 hover:text-stone-900'
-              ]}
-            >
-              {item.label}
-            </a>
-          </li>
-        ))}
-      </ul>
-      <button
-        type="button"
-        class="sm:hidden p-2 text-stone-600 hover:text-stone-900 transition-colors"
-        aria-label="Toggle menu"
-        id="mobile-menu-button"
-      >
-        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-        </svg>
-      </button>
-    </div>
-  </Container>
-  <div class="hidden border-t border-stone-200 sm:hidden" id="mobile-menu">
-    <Container>
-      <ul class="py-4 space-y-1">
-        {navItems.map((item) => (
-          <li>
-            <a
-              href={item.href}
-              class:list={[
-                'block py-2 text-sm font-medium no-underline transition-colors rounded-lg px-3 -mx-3',
-                currentPath === item.href
+                'px-3 py-2 text-sm font-medium no-underline transition-colors rounded-lg',
+                isActive(item.href)
                   ? 'text-forest-700 bg-forest-50'
                   : 'text-stone-600 hover:text-stone-900 hover:bg-stone-50'
               ]}
@@ -65,6 +45,59 @@ const currentPath = Astro.url.pathname;
           </li>
         ))}
       </ul>
+
+      <!-- Desktop CTA -->
+      <div class="hidden lg:flex items-center gap-3">
+        <Button href="/portal" variant="outline" size="sm">
+          Portal Login
+        </Button>
+      </div>
+
+      <!-- Mobile Menu Button -->
+      <button
+        type="button"
+        class="lg:hidden p-2 -mr-2 text-stone-600 hover:text-stone-900 hover:bg-stone-50 rounded-lg transition-colors"
+        aria-label="Toggle menu"
+        aria-expanded="false"
+        id="mobile-menu-button"
+      >
+        <svg class="h-6 w-6 menu-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+        <svg class="h-6 w-6 close-icon hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+  </Container>
+
+  <!-- Mobile Menu -->
+  <div class="hidden lg:hidden border-t border-stone-200 bg-white" id="mobile-menu">
+    <Container>
+      <nav class="py-4">
+        <ul class="space-y-1">
+          {navItems.map((item) => (
+            <li>
+              <a
+                href={item.href}
+                class:list={[
+                  'block py-2.5 px-3 -mx-3 text-base font-medium no-underline transition-colors rounded-lg',
+                  isActive(item.href)
+                    ? 'text-forest-700 bg-forest-50'
+                    : 'text-stone-700 hover:text-stone-900 hover:bg-stone-50'
+                ]}
+              >
+                {item.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+        <div class="mt-4 pt-4 border-t border-stone-200">
+          <Button href="/portal" variant="primary" size="md" fullWidth>
+            Portal Login
+          </Button>
+        </div>
+      </nav>
     </Container>
   </div>
 </header>
@@ -72,8 +105,32 @@ const currentPath = Astro.url.pathname;
 <script>
   const button = document.getElementById('mobile-menu-button');
   const menu = document.getElementById('mobile-menu');
+  const menuIcon = button?.querySelector('.menu-icon');
+  const closeIcon = button?.querySelector('.close-icon');
 
-  button?.addEventListener('click', () => {
-    menu?.classList.toggle('hidden');
+  function toggleMenu() {
+    const isOpen = menu?.classList.toggle('hidden');
+    button?.setAttribute('aria-expanded', String(!isOpen));
+    menuIcon?.classList.toggle('hidden');
+    closeIcon?.classList.toggle('hidden');
+  }
+
+  button?.addEventListener('click', toggleMenu);
+
+  // Close menu on escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !menu?.classList.contains('hidden')) {
+      toggleMenu();
+    }
+  });
+
+  // Close menu when clicking outside
+  document.addEventListener('click', (e) => {
+    const target = e.target as HTMLElement;
+    if (!menu?.classList.contains('hidden') &&
+        !menu?.contains(target) &&
+        !button?.contains(target)) {
+      toggleMenu();
+    }
   });
 </script>

@@ -4,11 +4,24 @@ import '@/styles/global.css';
 interface Props {
   title: string;
   description?: string;
+  image?: string;
+  canonicalUrl?: string;
+  noIndex?: boolean;
 }
 
-const { title, description = 'Plan-to-build housing platform for northern BC' } = Astro.props;
+const {
+  title,
+  description = 'Plan-to-build housing platform for northern BC',
+  image = '/og-image.png',
+  canonicalUrl,
+  noIndex = false
+} = Astro.props;
+
 const siteTitle = 'BuilderNest';
+const siteUrl = Astro.site?.toString() || '';
 const fullTitle = title === siteTitle ? title : `${title} | ${siteTitle}`;
+const resolvedImage = image.startsWith('http') ? image : `${siteUrl}${image}`;
+const resolvedCanonical = canonicalUrl || Astro.url.href;
 ---
 
 <!doctype html>
@@ -16,22 +29,50 @@ const fullTitle = title === siteTitle ? title : `${title} | ${siteTitle}`;
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- SEO Meta -->
+    <title>{fullTitle}</title>
     <meta name="description" content={description} />
+    {noIndex && <meta name="robots" content="noindex, nofollow" />}
+    <link rel="canonical" href={resolvedCanonical} />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={resolvedImage} />
+    <meta property="og:url" content={resolvedCanonical} />
+    <meta property="og:site_name" content={siteTitle} />
+    <meta property="og:locale" content="en_CA" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={resolvedImage} />
+
+    <!-- Additional SEO slot for page-specific meta -->
+    <slot name="head" />
 
     <!-- Preconnect to font origins -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
     <!-- Inter font - clean, highly readable -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
 
+    <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="generator" content={Astro.generator} />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
     <!-- Theme color for mobile browsers -->
     <meta name="theme-color" content="#394d47" />
 
-    <title>{fullTitle}</title>
+    <!-- Generator -->
+    <meta name="generator" content={Astro.generator} />
   </head>
   <body>
     <slot />

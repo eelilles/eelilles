@@ -2,7 +2,6 @@
 import PageLayout from '@layouts/PageLayout.astro';
 import Container from '@components/Container.astro';
 import Card from '@components/Card.astro';
-import SectionHeading from '@components/SectionHeading.astro';
 import Badge from '@components/Badge.astro';
 import { getCollection } from 'astro:content';
 
@@ -10,15 +9,16 @@ const modules = await getCollection('modules', ({ data }) => !data.draft);
 const sortedModules = modules.sort((a, b) => a.data.order - b.data.order);
 ---
 
-<PageLayout title="Modules" description="Explore building modules and components">
-  <section class="py-16">
+<PageLayout
+  title="Modules"
+  description="Explore building modules and components"
+  heroTitle="Modules"
+  heroSubtitle="Explore building modules and components for your project"
+>
+  <section class="py-12 md:py-16">
     <Container>
-      <SectionHeading
-        title="Modules"
-        subtitle="Explore building modules and components"
-      />
       {sortedModules.length > 0 ? (
-        <div class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {sortedModules.map((module) => (
             <Card href={`/modules/${module.slug}`}>
               <h3 class="text-stone-900">{module.data.title}</h3>
@@ -32,7 +32,7 @@ const sortedModules = modules.sort((a, b) => a.data.order - b.data.order);
           ))}
         </div>
       ) : (
-        <p class="mt-8 text-stone-500">No modules available yet.</p>
+        <p class="text-stone-500">No modules available yet.</p>
       )}
     </Container>
   </section>

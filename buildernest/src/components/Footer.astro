@@ -1,19 +1,142 @@
 ---
 import Container from './Container.astro';
+import Logo from './Logo.astro';
+import Button from './Button.astro';
+
+interface Props {
+  showCta?: boolean;
+}
+
+const { showCta = true } = Astro.props;
 
 const currentYear = new Date().getFullYear();
+
+const navLinks = [
+  { href: '/plans', label: 'Plans' },
+  { href: '/modules', label: 'Modules' },
+  { href: '/how-it-works', label: 'How it Works' },
+  { href: '/resources', label: 'Resources' },
+  { href: '/about', label: 'About' }
+];
+
+const legalLinks = [
+  { href: '/privacy', label: 'Privacy Policy' },
+  { href: '/terms', label: 'Terms of Service' }
+];
 ---
 
-<footer class="border-t border-stone-200 bg-white">
+<footer class="bg-stone-900 text-stone-300">
+  {showCta && (
+    <div class="border-b border-stone-800">
+      <Container>
+        <div class="py-12 md:py-16 text-center">
+          <h2 class="text-2xl md:text-3xl font-bold text-white">
+            Ready to start your build?
+          </h2>
+          <p class="mt-3 text-stone-400 max-w-xl mx-auto">
+            Explore our plans and find the perfect home for northern BC.
+          </p>
+          <div class="mt-6">
+            <Button href="/plans" variant="secondary" size="lg">
+              Get Started
+            </Button>
+          </div>
+        </div>
+      </Container>
+    </div>
+  )}
+
   <Container>
-    <div class="py-8">
-      <div class="flex flex-col items-center justify-between gap-4 sm:flex-row">
-        <p class="text-sm text-stone-600">
-          &copy; {currentYear} BuilderNest. All rights reserved.
-        </p>
-        <p class="text-sm text-stone-500">
-          Plan-to-build housing for northern BC
-        </p>
+    <div class="py-12 md:py-16">
+      <!-- Main Footer Content -->
+      <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+        <!-- Logo & Tagline -->
+        <div class="lg:col-span-2">
+          <a href="/" class="inline-block no-underline">
+            <Logo size="lg" class="[&_span]:text-white" />
+          </a>
+          <p class="mt-4 text-stone-400 max-w-sm">
+            Plan-to-build housing platform for northern BC. Helping you build
+            your dream home in Canada's most beautiful region.
+          </p>
+        </div>
+
+        <!-- Navigation -->
+        <div>
+          <h3 class="text-sm font-semibold text-white uppercase tracking-wider">
+            Navigation
+          </h3>
+          <ul class="mt-4 space-y-2">
+            {navLinks.map((link) => (
+              <li>
+                <a
+                  href={link.href}
+                  class="text-stone-400 hover:text-white no-underline transition-colors"
+                >
+                  {link.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <!-- Get Started -->
+        <div>
+          <h3 class="text-sm font-semibold text-white uppercase tracking-wider">
+            Get Started
+          </h3>
+          <ul class="mt-4 space-y-2">
+            <li>
+              <a
+                href="/portal"
+                class="text-stone-400 hover:text-white no-underline transition-colors"
+              >
+                Portal Login
+              </a>
+            </li>
+            <li>
+              <a
+                href="/contact"
+                class="text-stone-400 hover:text-white no-underline transition-colors"
+              >
+                Contact Us
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Disclaimer Slot -->
+      <slot name="disclaimer">
+        <div class="mt-10 pt-8 border-t border-stone-800">
+          <p class="text-sm text-stone-500">
+            BuilderNest provides housing plan information for educational purposes.
+            All plans should be reviewed by a licensed professional before construction.
+            Local building codes and regulations may apply.
+          </p>
+        </div>
+      </slot>
+
+      <!-- Bottom Bar -->
+      <div class="mt-8 pt-8 border-t border-stone-800">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <!-- Copyright -->
+          <p class="text-sm text-stone-500">
+            &copy; {currentYear} BuilderNest. All rights reserved.
+          </p>
+
+          <!-- Legal Links -->
+          <nav class="flex flex-wrap gap-x-6 gap-y-2">
+            {legalLinks.map((link) => (
+              <a
+                href={link.href}
+                class="text-sm text-stone-500 hover:text-stone-300 no-underline transition-colors"
+              >
+                {link.label}
+              </a>
+            ))}
+          </nav>
+        </div>
       </div>
     </div>
   </Container>
