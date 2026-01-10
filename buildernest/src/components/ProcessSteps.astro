@@ -1,0 +1,64 @@
+---
+interface Step {
+  number: number;
+  title: string;
+  description?: string;
+}
+
+interface Props {
+  steps: Step[];
+}
+
+const { steps } = Astro.props;
+---
+
+<div class="relative">
+  <!-- Desktop: horizontal layout -->
+  <div class="hidden md:block">
+    <!-- Connecting line -->
+    <div class="absolute top-6 left-0 right-0 h-0.5 bg-stone-200" aria-hidden="true"></div>
+
+    <ol class="relative grid gap-4" style={`grid-template-columns: repeat(${steps.length}, minmax(0, 1fr))`}>
+      {steps.map((step, index) => (
+        <li class="relative">
+          <!-- Step number -->
+          <div class="flex items-center justify-center w-12 h-12 mx-auto rounded-full bg-forest-700 text-white font-bold text-lg relative z-10">
+            {step.number}
+          </div>
+          <!-- Content -->
+          <div class="mt-4 text-center">
+            <h3 class="text-base font-semibold text-stone-900">{step.title}</h3>
+            {step.description && (
+              <p class="mt-1 text-sm text-stone-600">{step.description}</p>
+            )}
+          </div>
+        </li>
+      ))}
+    </ol>
+  </div>
+
+  <!-- Mobile: vertical layout -->
+  <div class="md:hidden">
+    <ol class="relative space-y-6">
+      {steps.map((step, index) => (
+        <li class="relative flex gap-4">
+          <!-- Connecting line (except last item) -->
+          {index < steps.length - 1 && (
+            <div class="absolute left-6 top-12 bottom-0 w-0.5 -translate-x-1/2 bg-stone-200" aria-hidden="true"></div>
+          )}
+          <!-- Step number -->
+          <div class="flex-shrink-0 flex items-center justify-center w-12 h-12 rounded-full bg-forest-700 text-white font-bold text-lg relative z-10">
+            {step.number}
+          </div>
+          <!-- Content -->
+          <div class="pt-2">
+            <h3 class="text-base font-semibold text-stone-900">{step.title}</h3>
+            {step.description && (
+              <p class="mt-1 text-sm text-stone-600">{step.description}</p>
+            )}
+          </div>
+        </li>
+      ))}
+    </ol>
+  </div>
+</div>

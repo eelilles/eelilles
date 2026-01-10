@@ -1,30 +1,349 @@
 ---
-import PageLayout from '@layouts/PageLayout.astro';
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Header from '@components/Header.astro';
+import Footer from '@components/Footer.astro';
 import Container from '@components/Container.astro';
 import Button from '@components/Button.astro';
+import Card from '@components/Card.astro';
+import Icon from '@components/Icon.astro';
+import ProcessSteps from '@components/ProcessSteps.astro';
+import ModuleTile from '@components/ModuleTile.astro';
+import PlanCard from '@components/PlanCard.astro';
+import SectionHeading from '@components/SectionHeading.astro';
+
+// Placeholder data for featured plans
+const featuredPlans = [
+  {
+    title: 'The Boreal',
+    href: '/plans/boreal',
+    sqft: 1200,
+    beds: 2,
+    baths: 1,
+    tags: ['Northern-ready', 'Off-grid option']
+  },
+  {
+    title: 'The Caribou',
+    href: '/plans/caribou',
+    sqft: 1600,
+    beds: 3,
+    baths: 2,
+    tags: ['Family', 'Accessible']
+  },
+  {
+    title: 'The Spruce',
+    href: '/plans/spruce',
+    sqft: 900,
+    beds: 1,
+    baths: 1,
+    tags: ['Compact', 'Starter']
+  },
+  {
+    title: 'The Omineca',
+    href: '/plans/omineca',
+    sqft: 1850,
+    beds: 3,
+    baths: 2,
+    tags: ['Northern-ready', 'Open concept']
+  },
+  {
+    title: 'The Taiga',
+    href: '/plans/taiga',
+    sqft: 1100,
+    beds: 2,
+    baths: 1,
+    tags: ['Off-grid option', 'Compact']
+  },
+  {
+    title: 'The Skeena',
+    href: '/plans/skeena',
+    sqft: 2100,
+    beds: 4,
+    baths: 2,
+    tags: ['Family', 'Flex space']
+  }
+];
+
+// Process steps
+const steps = [
+  { number: 1, title: 'Browse plans and shortlist' },
+  { number: 2, title: 'Request access for plan pack' },
+  { number: 3, title: 'Customize selections' },
+  { number: 4, title: 'Bid + award with clear scope' },
+  { number: 5, title: 'Build + document in portal' }
+];
+
+// Modules
+const modules = [
+  { title: 'Structure', icon: 'home' },
+  { title: 'Electrical', icon: 'bolt' },
+  { title: 'Heating', icon: 'fire' },
+  { title: 'Solar', icon: 'sun' },
+  { title: 'Water', icon: 'water' },
+  { title: 'Finishing', icon: 'adjustments' }
+];
+
+// Resources
+const resources = [
+  {
+    title: 'Northern Building Checklist',
+    description: 'Essential considerations for building in cold climates',
+    href: '/resources/northern-building-checklist'
+  },
+  {
+    title: 'Off-Grid Systems Guide',
+    description: 'Overview of solar, water, and heating options',
+    href: '/resources/off-grid-guide'
+  },
+  {
+    title: 'Budget Planning Template',
+    description: 'Spreadsheet for tracking costs and allowances',
+    href: '/resources/budget-template'
+  }
+];
 ---
 
-<PageLayout
+<BaseLayout
   title="BuilderNest"
-  description="Plan-to-build housing platform for northern BC"
-  heroSize="lg"
-  showFooterCta={false}
+  description="Plan-to-build housing platform for northern BC. Start with curated plans, structured procurement, and a portal workflow designed for real Canadian conditions."
 >
-  <section slot="hero" class="max-w-3xl">
-    <h1 class="text-stone-900">
-      Build your home in<br class="hidden sm:inline" /> northern BC
-    </h1>
-    <p class="mt-6 text-lg md:text-xl text-stone-600">
-      Plan-to-build housing platform designed for the unique challenges
-      and opportunities of building in Canada's north.
-    </p>
-    <div class="mt-8 flex flex-col sm:flex-row gap-4">
-      <Button href="/plans" variant="primary" size="lg">
-        Explore Plans
-      </Button>
-      <Button href="/how-it-works" variant="outline" size="lg">
-        How it Works
-      </Button>
-    </div>
-  </section>
-</PageLayout>
+  <div class="flex min-h-screen flex-col">
+    <Header />
+
+    <main class="flex-1">
+      <!-- Hero Section -->
+      <section class="relative bg-cream-100 border-b border-stone-200 overflow-hidden">
+        <Container>
+          <div class="py-16 md:py-24 lg:py-32">
+            <div class="max-w-3xl">
+              <h1 class="text-stone-900 text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight leading-tight">
+                Small, resilient homes — with a clearer path from plan to closeout.
+              </h1>
+              <p class="mt-6 text-lg md:text-xl text-stone-600 leading-relaxed">
+                BuilderNest is a plan-first, procurement-first system that helps homeowners
+                and builders reduce surprises, simplify bidding, and build with better
+                documentation — designed for real BC/Canadian conditions.
+              </p>
+              <div class="mt-8 flex flex-col sm:flex-row gap-4">
+                <Button href="/plans" variant="primary" size="lg">
+                  Browse Plans
+                </Button>
+                <Button href="/contact" variant="secondary" size="lg">
+                  Request Access
+                </Button>
+              </div>
+              <div class="mt-6">
+                <a
+                  href="/portal"
+                  class="inline-flex items-center gap-1 text-sm font-medium text-forest-600 hover:text-forest-700 no-underline"
+                >
+                  Builder? Apply / Login
+                  <Icon name="arrow-right" size="sm" />
+                </a>
+              </div>
+            </div>
+          </div>
+        </Container>
+      </section>
+
+      <!-- What BuilderNest Does -->
+      <section class="py-16 md:py-24 bg-white">
+        <Container>
+          <SectionHeading
+            title="What BuilderNest does"
+            align="center"
+          />
+          <div class="mt-12 grid gap-8 md:grid-cols-3">
+            <!-- Plan-first -->
+            <Card padding="lg">
+              <div class="flex items-center justify-center w-12 h-12 rounded-xl bg-forest-50 text-forest-600 mb-5">
+                <Icon name="document" size="lg" />
+              </div>
+              <h3 class="text-lg font-semibold text-stone-900">Plan-first</h3>
+              <p class="mt-2 text-stone-600">
+                Start with curated plans for practical, modern small homes — designed
+                for northern conditions and real-world budgets.
+              </p>
+            </Card>
+
+            <!-- Procurement-first -->
+            <Card padding="lg">
+              <div class="flex items-center justify-center w-12 h-12 rounded-xl bg-forest-50 text-forest-600 mb-5">
+                <Icon name="cube" size="lg" />
+              </div>
+              <h3 class="text-lg font-semibold text-stone-900">Procurement-first</h3>
+              <p class="mt-2 text-stone-600">
+                Structured options and controlled bid packages. Know what you're
+                getting before you commit, with clear scope for builders.
+              </p>
+            </Card>
+
+            <!-- Portal workflow -->
+            <Card padding="lg">
+              <div class="flex items-center justify-center w-12 h-12 rounded-xl bg-forest-50 text-forest-600 mb-5">
+                <Icon name="folder" size="lg" />
+              </div>
+              <h3 class="text-lg font-semibold text-stone-900">Portal workflow</h3>
+              <p class="mt-2 text-stone-600">
+                Single place for documents, photos, Q&A, and progress tracking.
+                Everything organized from planning through closeout.
+              </p>
+            </Card>
+          </div>
+        </Container>
+      </section>
+
+      <!-- How It Works -->
+      <section class="py-16 md:py-24 bg-cream-50 border-y border-stone-200">
+        <Container>
+          <SectionHeading
+            title="How it works"
+            align="center"
+          />
+          <div class="mt-12 max-w-4xl mx-auto">
+            <ProcessSteps steps={steps} />
+          </div>
+          <div class="mt-12 text-center">
+            <Button href="/how-it-works" variant="outline">
+              Learn more about the process
+            </Button>
+          </div>
+        </Container>
+      </section>
+
+      <!-- Featured Plans -->
+      <section class="py-16 md:py-24 bg-white">
+        <Container>
+          <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-12">
+            <SectionHeading
+              title="Featured Plans"
+              subtitle="Curated designs for northern BC living"
+            />
+            <a
+              href="/plans"
+              class="inline-flex items-center gap-1 text-sm font-medium text-forest-600 hover:text-forest-700 no-underline shrink-0"
+            >
+              View all plans
+              <Icon name="arrow-right" size="sm" />
+            </a>
+          </div>
+          <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {featuredPlans.map((plan) => (
+              <PlanCard {...plan} />
+            ))}
+          </div>
+        </Container>
+      </section>
+
+      <!-- Modules Overview -->
+      <section class="py-16 md:py-24 bg-cream-50 border-y border-stone-200">
+        <Container>
+          <SectionHeading
+            title="Modules"
+            subtitle="Add the modules you need — skip the ones you don't."
+            align="center"
+          />
+          <div class="mt-12 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
+            {modules.map((module) => (
+              <ModuleTile
+                title={module.title}
+                icon={module.icon}
+                href={`/modules#${module.title.toLowerCase()}`}
+              />
+            ))}
+          </div>
+          <div class="mt-10 text-center">
+            <Button href="/modules" variant="outline">
+              Explore all modules
+            </Button>
+          </div>
+        </Container>
+      </section>
+
+      <!-- Resources Preview -->
+      <section class="py-16 md:py-24 bg-white">
+        <Container>
+          <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-12">
+            <SectionHeading
+              title="Free guides and checklists"
+              subtitle="Resources to help you plan and build smarter"
+            />
+            <a
+              href="/resources"
+              class="inline-flex items-center gap-1 text-sm font-medium text-forest-600 hover:text-forest-700 no-underline shrink-0"
+            >
+              View all resources
+              <Icon name="arrow-right" size="sm" />
+            </a>
+          </div>
+          <div class="grid gap-6 md:grid-cols-3">
+            {resources.map((resource) => (
+              <Card href={resource.href} padding="lg">
+                <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-amber-50 text-amber-600 mb-4">
+                  <Icon name="book-open" size="md" />
+                </div>
+                <h3 class="text-base font-semibold text-stone-900">{resource.title}</h3>
+                <p class="mt-2 text-sm text-stone-600">{resource.description}</p>
+              </Card>
+            ))}
+          </div>
+        </Container>
+      </section>
+
+      <!-- Trust Block -->
+      <section class="py-16 md:py-24 bg-forest-800">
+        <Container>
+          <div class="max-w-3xl mx-auto text-center">
+            <h2 class="text-2xl md:text-3xl font-bold text-white">
+              Built for real conditions — and real projects.
+            </h2>
+            <div class="mt-8 grid gap-6 sm:grid-cols-3">
+              <div class="flex flex-col items-center gap-2">
+                <div class="flex items-center justify-center w-12 h-12 rounded-full bg-forest-700 text-forest-200">
+                  <Icon name="shield-check" size="lg" />
+                </div>
+                <span class="text-sm font-medium text-forest-100">Northern-tested designs</span>
+              </div>
+              <div class="flex flex-col items-center gap-2">
+                <div class="flex items-center justify-center w-12 h-12 rounded-full bg-forest-700 text-forest-200">
+                  <Icon name="clipboard-check" size="lg" />
+                </div>
+                <span class="text-sm font-medium text-forest-100">Clear documentation</span>
+              </div>
+              <div class="flex flex-col items-center gap-2">
+                <div class="flex items-center justify-center w-12 h-12 rounded-full bg-forest-700 text-forest-200">
+                  <Icon name="truck" size="lg" />
+                </div>
+                <span class="text-sm font-medium text-forest-100">Local builder network</span>
+              </div>
+            </div>
+          </div>
+        </Container>
+      </section>
+
+      <!-- CTA Band -->
+      <section class="py-16 md:py-20 bg-cream-100 border-t border-stone-200">
+        <Container>
+          <div class="max-w-2xl mx-auto text-center">
+            <h2 class="text-2xl md:text-3xl font-bold text-stone-900">
+              Ready to start?
+            </h2>
+            <p class="mt-4 text-lg text-stone-600">
+              Browse our plans to find the right fit, or request access to get started
+              with the full platform.
+            </p>
+            <div class="mt-8 flex flex-col sm:flex-row justify-center gap-4">
+              <Button href="/plans" variant="primary" size="lg">
+                Browse Plans
+              </Button>
+              <Button href="/contact" variant="outline" size="lg">
+                Request Access
+              </Button>
+            </div>
+          </div>
+        </Container>
+      </section>
+    </main>
+
+    <Footer showCta={false} />
+  </div>
+</BaseLayout>
