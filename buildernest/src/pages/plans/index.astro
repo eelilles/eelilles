@@ -1,0 +1,27 @@
+---
+import PageLayout from '@layouts/PageLayout.astro';
+import { getCollection } from 'astro:content';
+
+const plans = await getCollection('plans', ({ data }) => !data.draft);
+---
+
+<PageLayout title="Plans" description="Browse housing plans for northern BC">
+  <section class="container py-16">
+    <h1 class="text-neutral-900">Plans</h1>
+    <p class="mt-4 text-lg text-neutral-600">
+      Browse available housing plans
+    </p>
+    {plans.length > 0 ? (
+      <div class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {plans.map((plan) => (
+          <a href={`/plans/${plan.slug}`} class="card no-underline hover:shadow-md transition-shadow">
+            <h3 class="text-neutral-900">{plan.data.title}</h3>
+            <p class="mt-2 text-sm text-neutral-600">{plan.data.description}</p>
+          </a>
+        ))}
+      </div>
+    ) : (
+      <p class="mt-8 text-neutral-500">No plans available yet.</p>
+    )}
+  </section>
+</PageLayout>

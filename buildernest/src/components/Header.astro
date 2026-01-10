@@ -1,0 +1,75 @@
+---
+const navItems = [
+  { href: '/', label: 'Home' },
+  { href: '/plans', label: 'Plans' },
+  { href: '/modules', label: 'Modules' },
+  { href: '/resources', label: 'Resources' }
+];
+
+const currentPath = Astro.url.pathname;
+---
+
+<header class="border-b border-neutral-200 bg-white">
+  <nav class="container">
+    <div class="flex h-16 items-center justify-between">
+      <a href="/" class="text-xl font-bold text-neutral-900 no-underline hover:text-primary-600">
+        BuilderNest
+      </a>
+      <ul class="hidden items-center gap-6 sm:flex">
+        {navItems.map((item) => (
+          <li>
+            <a
+              href={item.href}
+              class:list={[
+                'text-sm font-medium no-underline transition-colors',
+                currentPath === item.href
+                  ? 'text-primary-600'
+                  : 'text-neutral-600 hover:text-neutral-900'
+              ]}
+            >
+              {item.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+      <button
+        type="button"
+        class="sm:hidden p-2 text-neutral-600 hover:text-neutral-900"
+        aria-label="Toggle menu"
+        id="mobile-menu-button"
+      >
+        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+    </div>
+  </nav>
+  <div class="hidden border-t border-neutral-200 sm:hidden" id="mobile-menu">
+    <ul class="container py-4 space-y-2">
+      {navItems.map((item) => (
+        <li>
+          <a
+            href={item.href}
+            class:list={[
+              'block py-2 text-sm font-medium no-underline',
+              currentPath === item.href
+                ? 'text-primary-600'
+                : 'text-neutral-600 hover:text-neutral-900'
+            ]}
+          >
+            {item.label}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+</header>
+
+<script>
+  const button = document.getElementById('mobile-menu-button');
+  const menu = document.getElementById('mobile-menu');
+
+  button?.addEventListener('click', () => {
+    menu?.classList.toggle('hidden');
+  });
+</script>
