@@ -1,0 +1,534 @@
+---
+import Icon from '@components/Icon.astro';
+
+interface Props {
+  webhookUrl?: string;
+  class?: string;
+}
+
+const { webhookUrl = import.meta.env.PUBLIC_WEBHOOK_URL || 'https://hooks.buildernest.ca/intake', class: className } = Astro.props;
+
+const regions = [
+  { value: '', label: 'Select your region...' },
+  { value: 'northwest_bc', label: 'Northwest BC (Prince Rupert, Terrace, Kitimat)' },
+  { value: 'northern_interior', label: 'Northern Interior (Prince George, Quesnel)' },
+  { value: 'peace_region', label: 'Peace Region (Fort St. John, Dawson Creek)' },
+  { value: 'cariboo', label: 'Cariboo (Williams Lake, 100 Mile House)' },
+  { value: 'bulkley_nechako', label: 'Bulkley-Nechako (Burns Lake, Vanderhoof)' },
+  { value: 'other_bc', label: 'Other BC' },
+  { value: 'outside_bc', label: 'Outside BC' }
+];
+
+const iAmOptions = [
+  { value: '', label: 'Select one...' },
+  { value: 'owner', label: 'Future homeowner' },
+  { value: 'acting_for_family', label: 'Acting for family member' },
+  { value: 'developer', label: 'Developer / investor' },
+  { value: 'other', label: 'Other' }
+];
+
+const projectStages = [
+  { value: '', label: 'Select your stage...' },
+  { value: 'exploring', label: 'Just exploring options' },
+  { value: 'have_site', label: 'Have land / site secured' },
+  { value: 'have_funding', label: 'Have financing arranged' },
+  { value: 'ready_to_bid', label: 'Ready to get bids' },
+  { value: 'already_building', label: 'Already in construction' }
+];
+
+const timelines = [
+  { value: '', label: 'Select timeline...' },
+  { value: 'lt_3mo', label: 'Less than 3 months' },
+  { value: '3_6mo', label: '3-6 months' },
+  { value: '6_12mo', label: '6-12 months' },
+  { value: '12_plus', label: '12+ months' },
+  { value: 'unsure', label: 'Not sure yet' }
+];
+
+const moduleOptions = [
+  { value: 'finance', label: 'Finance & Budget Planning' },
+  { value: 'resilience', label: 'Climate Resilience' },
+  { value: 'procurement', label: 'Procurement & Bidding' },
+  { value: 'construction_mgmt', label: 'Construction Management' }
+];
+---
+
+<form
+  id="owner-intake-form"
+  class:list={['owner-intake-form', className]}
+  data-webhook-url={webhookUrl}
+>
+  <!-- Hidden fields -->
+  <input type="hidden" name="lead_type" value="owner" />
+  <input type="hidden" name="source_page_url" id="source_page_url" value="" />
+  <input type="hidden" name="form_version" value="v1" />
+
+  <div class="space-y-8">
+    <!-- Section: Contact Information -->
+    <fieldset class="space-y-4">
+      <legend class="text-lg font-semibold text-forest-900 mb-4 pb-2 border-b border-stone-200">
+        Contact Information
+      </legend>
+
+      <div class="grid md:grid-cols-2 gap-4">
+        <!-- Full Name -->
+        <div>
+          <label for="full_name" class="form-label">
+            Full name <span class="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            id="full_name"
+            name="full_name"
+            required
+            autocomplete="name"
+            class="form-input"
+            placeholder="Jane Smith"
+          />
+          <p class="form-error hidden" id="full_name_error">Please enter your name</p>
+        </div>
+
+        <!-- Email -->
+        <div>
+          <label for="email" class="form-label">
+            Email address <span class="text-red-500">*</span>
+          </label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            required
+            autocomplete="email"
+            class="form-input"
+            placeholder="jane@example.com"
+          />
+          <p class="form-error hidden" id="email_error">Please enter a valid email</p>
+        </div>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-4">
+        <!-- Phone -->
+        <div>
+          <label for="phone" class="form-label">
+            Phone number
+          </label>
+          <input
+            type="tel"
+            id="phone"
+            name="phone"
+            autocomplete="tel"
+            class="form-input"
+            placeholder="250-555-0123"
+          />
+        </div>
+
+        <!-- Region -->
+        <div>
+          <label for="region" class="form-label">
+            Region <span class="text-red-500">*</span>
+          </label>
+          <select id="region" name="region" required class="form-select">
+            {regions.map((opt) => (
+              <option value={opt.value}>{opt.label}</option>
+            ))}
+          </select>
+          <p class="form-error hidden" id="region_error">Please select your region</p>
+        </div>
+      </div>
+    </fieldset>
+
+    <!-- Section: About You -->
+    <fieldset class="space-y-4">
+      <legend class="text-lg font-semibold text-forest-900 mb-4 pb-2 border-b border-stone-200">
+        About Your Project
+      </legend>
+
+      <div class="grid md:grid-cols-2 gap-4">
+        <!-- I Am -->
+        <div>
+          <label for="i_am" class="form-label">
+            I am a... <span class="text-red-500">*</span>
+          </label>
+          <select id="i_am" name="i_am" required class="form-select">
+            {iAmOptions.map((opt) => (
+              <option value={opt.value}>{opt.label}</option>
+            ))}
+          </select>
+          <p class="form-error hidden" id="i_am_error">Please select an option</p>
+        </div>
+
+        <!-- Project Stage -->
+        <div>
+          <label for="project_stage" class="form-label">
+            Project stage <span class="text-red-500">*</span>
+          </label>
+          <select id="project_stage" name="project_stage" required class="form-select">
+            {projectStages.map((opt) => (
+              <option value={opt.value}>{opt.label}</option>
+            ))}
+          </select>
+          <p class="form-error hidden" id="project_stage_error">Please select your project stage</p>
+        </div>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-4">
+        <!-- Timeline -->
+        <div>
+          <label for="timeline" class="form-label">
+            When do you want to start?
+          </label>
+          <select id="timeline" name="timeline" class="form-select">
+            {timelines.map((opt) => (
+              <option value={opt.value}>{opt.label}</option>
+            ))}
+          </select>
+        </div>
+
+        <!-- Have Site -->
+        <div class="flex items-center pt-8">
+          <label class="flex items-center gap-3 cursor-pointer">
+            <input
+              type="checkbox"
+              id="have_site"
+              name="have_site"
+              value="yes"
+              class="form-checkbox"
+            />
+            <span class="text-stone-700">I have a building site</span>
+          </label>
+        </div>
+      </div>
+    </fieldset>
+
+    <!-- Section: Interests -->
+    <fieldset class="space-y-4">
+      <legend class="text-lg font-semibold text-forest-900 mb-4 pb-2 border-b border-stone-200">
+        What Are You Looking For?
+      </legend>
+
+      <!-- Plan Interest -->
+      <div>
+        <label for="plan_interest" class="form-label">
+          Any specific plans you're interested in?
+        </label>
+        <input
+          type="text"
+          id="plan_interest"
+          name="plan_interest"
+          class="form-input"
+          placeholder="e.g., The Boreal, or 'something around 1200 sq ft with 2 beds'"
+        />
+        <p class="form-hint">Leave blank if you're not sure yet</p>
+      </div>
+
+      <!-- Module Interest -->
+      <div>
+        <label class="form-label">Which modules interest you?</label>
+        <p class="form-hint mb-3">Select all that apply</p>
+        <div class="grid sm:grid-cols-2 gap-3">
+          {moduleOptions.map((opt) => (
+            <label class="flex items-center gap-3 p-3 bg-stone-50 rounded-lg cursor-pointer hover:bg-stone-100 transition-colors">
+              <input
+                type="checkbox"
+                name="module_interest"
+                value={opt.value}
+                class="form-checkbox"
+              />
+              <span class="text-stone-700">{opt.label}</span>
+            </label>
+          ))}
+        </div>
+      </div>
+
+      <!-- Message / Goal -->
+      <div>
+        <label for="message_goal" class="form-label">
+          Tell us about your project and goals <span class="text-red-500">*</span>
+        </label>
+        <textarea
+          id="message_goal"
+          name="message_goal"
+          required
+          rows="4"
+          class="form-textarea"
+          placeholder="What are you hoping to build? What's driving your timeline? Any specific challenges or questions?"
+        ></textarea>
+        <p class="form-error hidden" id="message_goal_error">Please tell us about your project</p>
+      </div>
+    </fieldset>
+
+    <!-- Section: Consent -->
+    <fieldset class="space-y-4">
+      <div class="bg-cream-50 rounded-lg p-4">
+        <label class="flex items-start gap-3 cursor-pointer">
+          <input
+            type="checkbox"
+            id="consent_contact"
+            name="consent_contact"
+            value="yes"
+            required
+            class="form-checkbox mt-1"
+          />
+          <span class="text-sm text-stone-700">
+            I agree to be contacted by BuilderNest about my project. I understand my information will be handled according to the <a href="/privacy" class="text-forest-600 hover:underline">Privacy Policy</a>. <span class="text-red-500">*</span>
+          </span>
+        </label>
+        <p class="form-error hidden ml-8 mt-1" id="consent_contact_error">Please confirm you agree to be contacted</p>
+      </div>
+    </fieldset>
+
+    <!-- Submit -->
+    <div class="pt-4">
+      <button
+        type="submit"
+        id="submit-btn"
+        class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-forest-600 hover:bg-forest-700 text-white font-semibold py-3 px-8 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        <span id="submit-text">Submit Inquiry</span>
+        <span id="submit-loading" class="hidden">
+          <svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+        </span>
+        <Icon name="arrow-right" size="sm" id="submit-icon" />
+      </button>
+    </div>
+  </div>
+
+  <!-- Success Message -->
+  <div id="form-success" class="hidden">
+    <div class="text-center py-8">
+      <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <Icon name="check" size="xl" class="text-green-600" />
+      </div>
+      <h3 class="text-2xl font-bold text-forest-900 mb-2">Thank you!</h3>
+      <p class="text-stone-600 max-w-md mx-auto">
+        We've received your inquiry and will be in touch within 1-2 business days to discuss your project.
+      </p>
+    </div>
+  </div>
+
+  <!-- Error Message -->
+  <div id="form-error" class="hidden mt-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+    <div class="flex items-start gap-3">
+      <Icon name="x" size="md" class="text-red-600 shrink-0 mt-0.5" />
+      <div>
+        <h4 class="font-semibold text-red-900">Something went wrong</h4>
+        <p class="text-red-700 text-sm mt-1">Please try again or email us directly at <a href="mailto:hello@buildernest.ca" class="underline">hello@buildernest.ca</a></p>
+      </div>
+    </div>
+  </div>
+</form>
+
+<style>
+  .form-label {
+    @apply block text-sm font-medium text-stone-700 mb-2;
+  }
+
+  .form-input {
+    @apply w-full px-4 py-3 rounded-lg border border-stone-300 bg-white text-stone-900;
+    @apply focus:border-forest-500 focus:ring-2 focus:ring-forest-200 focus:outline-none;
+    @apply transition-colors;
+    @apply placeholder:text-stone-400;
+  }
+
+  .form-input.error {
+    @apply border-red-500 focus:border-red-500 focus:ring-red-200;
+  }
+
+  .form-select {
+    @apply w-full px-4 py-3 rounded-lg border border-stone-300 bg-white text-stone-900;
+    @apply focus:border-forest-500 focus:ring-2 focus:ring-forest-200 focus:outline-none;
+    @apply transition-colors appearance-none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.75rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    padding-right: 2.5rem;
+  }
+
+  .form-select.error {
+    @apply border-red-500 focus:border-red-500 focus:ring-red-200;
+  }
+
+  .form-textarea {
+    @apply w-full px-4 py-3 rounded-lg border border-stone-300 bg-white text-stone-900;
+    @apply focus:border-forest-500 focus:ring-2 focus:ring-forest-200 focus:outline-none;
+    @apply transition-colors resize-none;
+    @apply placeholder:text-stone-400;
+  }
+
+  .form-textarea.error {
+    @apply border-red-500 focus:border-red-500 focus:ring-red-200;
+  }
+
+  .form-checkbox {
+    @apply w-5 h-5 rounded border-stone-300 text-forest-600;
+    @apply focus:ring-2 focus:ring-forest-200 focus:ring-offset-0;
+    @apply cursor-pointer;
+  }
+
+  .form-hint {
+    @apply text-sm text-stone-500 mt-1;
+  }
+
+  .form-error {
+    @apply text-sm text-red-600 mt-1;
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('owner-intake-form') as HTMLFormElement;
+    if (!form) return;
+
+    // Set source page URL
+    const sourceUrlInput = document.getElementById('source_page_url') as HTMLInputElement;
+    if (sourceUrlInput) {
+      sourceUrlInput.value = window.location.href;
+    }
+
+    const submitBtn = document.getElementById('submit-btn') as HTMLButtonElement;
+    const submitText = document.getElementById('submit-text');
+    const submitLoading = document.getElementById('submit-loading');
+    const submitIcon = document.getElementById('submit-icon');
+    const formSuccess = document.getElementById('form-success');
+    const formError = document.getElementById('form-error');
+
+    // Validation helper
+    const showError = (fieldId: string, show: boolean) => {
+      const field = document.getElementById(fieldId) as HTMLElement;
+      const error = document.getElementById(`${fieldId}_error`);
+      if (field && error) {
+        if (show) {
+          field.classList.add('error');
+          error.classList.remove('hidden');
+        } else {
+          field.classList.remove('error');
+          error.classList.add('hidden');
+        }
+      }
+    };
+
+    // Real-time validation
+    const requiredFields = ['full_name', 'email', 'region', 'i_am', 'project_stage', 'message_goal', 'consent_contact'];
+    requiredFields.forEach(fieldId => {
+      const field = document.getElementById(fieldId);
+      if (field) {
+        field.addEventListener('blur', () => {
+          const value = field instanceof HTMLInputElement && field.type === 'checkbox'
+            ? field.checked
+            : (field as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement).value;
+          showError(fieldId, !value);
+        });
+        field.addEventListener('input', () => {
+          showError(fieldId, false);
+        });
+        field.addEventListener('change', () => {
+          showError(fieldId, false);
+        });
+      }
+    });
+
+    // Email validation
+    const emailField = document.getElementById('email') as HTMLInputElement;
+    if (emailField) {
+      emailField.addEventListener('blur', () => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        showError('email', !emailRegex.test(emailField.value));
+      });
+    }
+
+    // Form submission
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      // Validate all required fields
+      let hasErrors = false;
+      requiredFields.forEach(fieldId => {
+        const field = document.getElementById(fieldId);
+        if (field) {
+          const value = field instanceof HTMLInputElement && field.type === 'checkbox'
+            ? field.checked
+            : (field as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement).value;
+          if (!value) {
+            showError(fieldId, true);
+            hasErrors = true;
+          }
+        }
+      });
+
+      // Email format check
+      if (emailField) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(emailField.value)) {
+          showError('email', true);
+          hasErrors = true;
+        }
+      }
+
+      if (hasErrors) {
+        // Scroll to first error
+        const firstError = form.querySelector('.error');
+        if (firstError) {
+          firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        return;
+      }
+
+      // Show loading state
+      submitBtn.disabled = true;
+      submitText?.classList.add('hidden');
+      submitIcon?.classList.add('hidden');
+      submitLoading?.classList.remove('hidden');
+      formError?.classList.add('hidden');
+
+      // Collect form data
+      const formData = new FormData(form);
+      const data: Record<string, any> = {};
+
+      formData.forEach((value, key) => {
+        if (key === 'module_interest') {
+          if (!data[key]) data[key] = [];
+          data[key].push(value);
+        } else {
+          data[key] = value;
+        }
+      });
+
+      // Convert checkboxes to booleans
+      data.have_site = formData.get('have_site') === 'yes';
+      data.consent_contact = formData.get('consent_contact') === 'yes';
+
+      try {
+        const webhookUrl = form.dataset.webhookUrl || '';
+        const response = await fetch(webhookUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data),
+        });
+
+        if (response.ok) {
+          // Hide form, show success
+          const formFields = form.querySelector('.space-y-8') as HTMLElement;
+          if (formFields) formFields.classList.add('hidden');
+          formSuccess?.classList.remove('hidden');
+        } else {
+          throw new Error('Form submission failed');
+        }
+      } catch (error) {
+        console.error('Form submission error:', error);
+        formError?.classList.remove('hidden');
+      } finally {
+        // Reset button state
+        submitBtn.disabled = false;
+        submitText?.classList.remove('hidden');
+        submitIcon?.classList.remove('hidden');
+        submitLoading?.classList.add('hidden');
+      }
+    });
+  });
+</script>

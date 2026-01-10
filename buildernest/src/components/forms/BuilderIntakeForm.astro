@@ -1,0 +1,687 @@
+---
+import Icon from '@components/Icon.astro';
+
+interface Props {
+  webhookUrl?: string;
+  class?: string;
+}
+
+const { webhookUrl = import.meta.env.PUBLIC_WEBHOOK_URL || 'https://hooks.buildernest.ca/intake', class: className } = Astro.props;
+
+const regions = [
+  { value: 'northwest_bc', label: 'Northwest BC (Prince Rupert, Terrace, Kitimat)' },
+  { value: 'northern_interior', label: 'Northern Interior (Prince George, Quesnel)' },
+  { value: 'peace_region', label: 'Peace Region (Fort St. John, Dawson Creek)' },
+  { value: 'cariboo', label: 'Cariboo (Williams Lake, 100 Mile House)' },
+  { value: 'bulkley_nechako', label: 'Bulkley-Nechako (Burns Lake, Vanderhoof)' },
+  { value: 'other_bc', label: 'Other BC' }
+];
+
+const companyTypes = [
+  { value: '', label: 'Select type...' },
+  { value: 'general_contractor', label: 'General Contractor' },
+  { value: 'design_build', label: 'Design-Build Firm' },
+  { value: 'trade_contractor', label: 'Trade Contractor / Subcontractor' },
+  { value: 'owner_builder_support', label: 'Owner-Builder Support' },
+  { value: 'project_management', label: 'Project Management' },
+  { value: 'other', label: 'Other' }
+];
+
+const projectTypes = [
+  { value: 'new_residential', label: 'New residential construction' },
+  { value: 'renovations', label: 'Renovations / additions' },
+  { value: 'adu_secondary', label: 'ADUs / secondary suites' },
+  { value: 'multi_family', label: 'Multi-family / duplex' },
+  { value: 'commercial', label: 'Light commercial' },
+  { value: 'remote_access', label: 'Remote / off-grid builds' }
+];
+
+const yearsInBusiness = [
+  { value: '', label: 'Select...' },
+  { value: 'lt_2', label: 'Less than 2 years' },
+  { value: '2_5', label: '2-5 years' },
+  { value: '5_10', label: '5-10 years' },
+  { value: '10_plus', label: '10+ years' }
+];
+
+const annualProjects = [
+  { value: '', label: 'Select...' },
+  { value: '1_2', label: '1-2 projects' },
+  { value: '3_5', label: '3-5 projects' },
+  { value: '6_10', label: '6-10 projects' },
+  { value: '10_plus', label: '10+ projects' }
+];
+---
+
+<form
+  id="builder-intake-form"
+  class:list={['builder-intake-form', className]}
+  data-webhook-url={webhookUrl}
+>
+  <!-- Hidden fields -->
+  <input type="hidden" name="lead_type" value="builder" />
+  <input type="hidden" name="source_page_url" id="builder_source_page_url" value="" />
+  <input type="hidden" name="form_version" value="v1" />
+
+  <div class="space-y-8">
+    <!-- Section: Company Information -->
+    <fieldset class="space-y-4">
+      <legend class="text-lg font-semibold text-forest-900 mb-4 pb-2 border-b border-stone-200">
+        Company Information
+      </legend>
+
+      <div class="grid md:grid-cols-2 gap-4">
+        <!-- Company Name -->
+        <div>
+          <label for="company_name" class="form-label">
+            Company name <span class="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            id="company_name"
+            name="company_name"
+            required
+            class="form-input"
+            placeholder="ABC Construction Ltd."
+          />
+          <p class="form-error hidden" id="company_name_error">Please enter your company name</p>
+        </div>
+
+        <!-- Company Type -->
+        <div>
+          <label for="company_type" class="form-label">
+            Company type <span class="text-red-500">*</span>
+          </label>
+          <select id="company_type" name="company_type" required class="form-select">
+            {companyTypes.map((opt) => (
+              <option value={opt.value}>{opt.label}</option>
+            ))}
+          </select>
+          <p class="form-error hidden" id="company_type_error">Please select your company type</p>
+        </div>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-4">
+        <!-- Years in Business -->
+        <div>
+          <label for="years_in_business" class="form-label">
+            Years in business
+          </label>
+          <select id="years_in_business" name="years_in_business" class="form-select">
+            {yearsInBusiness.map((opt) => (
+              <option value={opt.value}>{opt.label}</option>
+            ))}
+          </select>
+        </div>
+
+        <!-- Annual Projects -->
+        <div>
+          <label for="annual_projects" class="form-label">
+            Typical annual projects
+          </label>
+          <select id="annual_projects" name="annual_projects" class="form-select">
+            {annualProjects.map((opt) => (
+              <option value={opt.value}>{opt.label}</option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      <!-- Website -->
+      <div>
+        <label for="website" class="form-label">
+          Website
+        </label>
+        <input
+          type="url"
+          id="website"
+          name="website"
+          class="form-input"
+          placeholder="https://www.yourcompany.com"
+        />
+      </div>
+    </fieldset>
+
+    <!-- Section: Contact Information -->
+    <fieldset class="space-y-4">
+      <legend class="text-lg font-semibold text-forest-900 mb-4 pb-2 border-b border-stone-200">
+        Primary Contact
+      </legend>
+
+      <div class="grid md:grid-cols-2 gap-4">
+        <!-- Contact Name -->
+        <div>
+          <label for="contact_name" class="form-label">
+            Contact name <span class="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            id="contact_name"
+            name="contact_name"
+            required
+            autocomplete="name"
+            class="form-input"
+            placeholder="John Builder"
+          />
+          <p class="form-error hidden" id="contact_name_error">Please enter contact name</p>
+        </div>
+
+        <!-- Contact Title -->
+        <div>
+          <label for="contact_title" class="form-label">
+            Title / Role
+          </label>
+          <input
+            type="text"
+            id="contact_title"
+            name="contact_title"
+            class="form-input"
+            placeholder="Owner, Project Manager, etc."
+          />
+        </div>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-4">
+        <!-- Email -->
+        <div>
+          <label for="builder_email" class="form-label">
+            Email address <span class="text-red-500">*</span>
+          </label>
+          <input
+            type="email"
+            id="builder_email"
+            name="email"
+            required
+            autocomplete="email"
+            class="form-input"
+            placeholder="john@abcconstruction.com"
+          />
+          <p class="form-error hidden" id="builder_email_error">Please enter a valid email</p>
+        </div>
+
+        <!-- Phone -->
+        <div>
+          <label for="builder_phone" class="form-label">
+            Phone number <span class="text-red-500">*</span>
+          </label>
+          <input
+            type="tel"
+            id="builder_phone"
+            name="phone"
+            required
+            autocomplete="tel"
+            class="form-input"
+            placeholder="250-555-0123"
+          />
+          <p class="form-error hidden" id="builder_phone_error">Please enter phone number</p>
+        </div>
+      </div>
+    </fieldset>
+
+    <!-- Section: Service Area & Capabilities -->
+    <fieldset class="space-y-4">
+      <legend class="text-lg font-semibold text-forest-900 mb-4 pb-2 border-b border-stone-200">
+        Service Area & Capabilities
+      </legend>
+
+      <!-- Service Regions -->
+      <div>
+        <label class="form-label">Service regions <span class="text-red-500">*</span></label>
+        <p class="form-hint mb-3">Select all regions you serve</p>
+        <div class="grid sm:grid-cols-2 gap-3">
+          {regions.map((opt) => (
+            <label class="flex items-center gap-3 p-3 bg-stone-50 rounded-lg cursor-pointer hover:bg-stone-100 transition-colors">
+              <input
+                type="checkbox"
+                name="service_regions"
+                value={opt.value}
+                class="form-checkbox"
+              />
+              <span class="text-stone-700 text-sm">{opt.label}</span>
+            </label>
+          ))}
+        </div>
+        <p class="form-error hidden" id="service_regions_error">Please select at least one region</p>
+      </div>
+
+      <!-- Project Types -->
+      <div>
+        <label class="form-label">Project types</label>
+        <p class="form-hint mb-3">Select all that apply</p>
+        <div class="grid sm:grid-cols-2 gap-3">
+          {projectTypes.map((opt) => (
+            <label class="flex items-center gap-3 p-3 bg-stone-50 rounded-lg cursor-pointer hover:bg-stone-100 transition-colors">
+              <input
+                type="checkbox"
+                name="project_types"
+                value={opt.value}
+                class="form-checkbox"
+              />
+              <span class="text-stone-700 text-sm">{opt.label}</span>
+            </label>
+          ))}
+        </div>
+      </div>
+    </fieldset>
+
+    <!-- Section: Insurance & Licensing -->
+    <fieldset class="space-y-4">
+      <legend class="text-lg font-semibold text-forest-900 mb-4 pb-2 border-b border-stone-200">
+        Insurance & Licensing
+      </legend>
+
+      <div class="grid md:grid-cols-2 gap-4">
+        <!-- Liability Insurance -->
+        <div class="flex items-center">
+          <label class="flex items-center gap-3 cursor-pointer">
+            <input
+              type="checkbox"
+              id="has_liability_insurance"
+              name="has_liability_insurance"
+              value="yes"
+              class="form-checkbox"
+            />
+            <span class="text-stone-700">Commercial general liability insurance</span>
+          </label>
+        </div>
+
+        <!-- WCB -->
+        <div class="flex items-center">
+          <label class="flex items-center gap-3 cursor-pointer">
+            <input
+              type="checkbox"
+              id="has_wcb"
+              name="has_wcb"
+              value="yes"
+              class="form-checkbox"
+            />
+            <span class="text-stone-700">WorkSafeBC coverage</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-4">
+        <!-- Licensed Builder -->
+        <div class="flex items-center">
+          <label class="flex items-center gap-3 cursor-pointer">
+            <input
+              type="checkbox"
+              id="is_licensed_builder"
+              name="is_licensed_builder"
+              value="yes"
+              class="form-checkbox"
+            />
+            <span class="text-stone-700">BC Licensed Residential Builder</span>
+          </label>
+        </div>
+
+        <!-- HPO Enrolled -->
+        <div class="flex items-center">
+          <label class="flex items-center gap-3 cursor-pointer">
+            <input
+              type="checkbox"
+              id="hpo_enrolled"
+              name="hpo_enrolled"
+              value="yes"
+              class="form-checkbox"
+            />
+            <span class="text-stone-700">Enrolled with BC Housing HPO</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- License Number -->
+      <div class="max-w-md">
+        <label for="license_number" class="form-label">
+          BC Builder License # (if applicable)
+        </label>
+        <input
+          type="text"
+          id="license_number"
+          name="license_number"
+          class="form-input"
+          placeholder="e.g., 12345"
+        />
+      </div>
+    </fieldset>
+
+    <!-- Section: Interest & Message -->
+    <fieldset class="space-y-4">
+      <legend class="text-lg font-semibold text-forest-900 mb-4 pb-2 border-b border-stone-200">
+        Your Interest in BuilderNest
+      </legend>
+
+      <!-- Interest Type -->
+      <div>
+        <label class="form-label">What interests you about BuilderNest?</label>
+        <p class="form-hint mb-3">Select all that apply</p>
+        <div class="space-y-2">
+          <label class="flex items-center gap-3 cursor-pointer">
+            <input type="checkbox" name="interest_type" value="receive_bids" class="form-checkbox" />
+            <span class="text-stone-700">Receiving bid opportunities from BuilderNest clients</span>
+          </label>
+          <label class="flex items-center gap-3 cursor-pointer">
+            <input type="checkbox" name="interest_type" value="directory_listing" class="form-checkbox" />
+            <span class="text-stone-700">Being listed in the BuilderNest contractor directory</span>
+          </label>
+          <label class="flex items-center gap-3 cursor-pointer">
+            <input type="checkbox" name="interest_type" value="partnership" class="form-checkbox" />
+            <span class="text-stone-700">Partnership / referral arrangement</span>
+          </label>
+          <label class="flex items-center gap-3 cursor-pointer">
+            <input type="checkbox" name="interest_type" value="learn_more" class="form-checkbox" />
+            <span class="text-stone-700">Just want to learn more</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Message -->
+      <div>
+        <label for="builder_message" class="form-label">
+          Anything else you'd like us to know?
+        </label>
+        <textarea
+          id="builder_message"
+          name="message"
+          rows="4"
+          class="form-textarea"
+          placeholder="Tell us about your company, specialties, or any questions you have..."
+        ></textarea>
+      </div>
+    </fieldset>
+
+    <!-- Section: Consent -->
+    <fieldset class="space-y-4">
+      <div class="bg-cream-50 rounded-lg p-4">
+        <label class="flex items-start gap-3 cursor-pointer">
+          <input
+            type="checkbox"
+            id="builder_consent"
+            name="consent_contact"
+            value="yes"
+            required
+            class="form-checkbox mt-1"
+          />
+          <span class="text-sm text-stone-700">
+            I agree to be contacted by BuilderNest about partnership opportunities. I understand my information will be handled according to the <a href="/privacy" class="text-forest-600 hover:underline">Privacy Policy</a>. <span class="text-red-500">*</span>
+          </span>
+        </label>
+        <p class="form-error hidden ml-8 mt-1" id="builder_consent_error">Please confirm you agree to be contacted</p>
+      </div>
+    </fieldset>
+
+    <!-- Submit -->
+    <div class="pt-4">
+      <button
+        type="submit"
+        id="builder-submit-btn"
+        class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-forest-600 hover:bg-forest-700 text-white font-semibold py-3 px-8 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        <span id="builder-submit-text">Submit Application</span>
+        <span id="builder-submit-loading" class="hidden">
+          <svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+        </span>
+        <Icon name="arrow-right" size="sm" id="builder-submit-icon" />
+      </button>
+    </div>
+  </div>
+
+  <!-- Success Message -->
+  <div id="builder-form-success" class="hidden">
+    <div class="text-center py-8">
+      <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <Icon name="check" size="xl" class="text-green-600" />
+      </div>
+      <h3 class="text-2xl font-bold text-forest-900 mb-2">Application Received!</h3>
+      <p class="text-stone-600 max-w-md mx-auto">
+        Thank you for your interest in working with BuilderNest. We'll review your information and be in touch within 3-5 business days.
+      </p>
+    </div>
+  </div>
+
+  <!-- Error Message -->
+  <div id="builder-form-error" class="hidden mt-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+    <div class="flex items-start gap-3">
+      <Icon name="x" size="md" class="text-red-600 shrink-0 mt-0.5" />
+      <div>
+        <h4 class="font-semibold text-red-900">Something went wrong</h4>
+        <p class="text-red-700 text-sm mt-1">Please try again or email us directly at <a href="mailto:builders@buildernest.ca" class="underline">builders@buildernest.ca</a></p>
+      </div>
+    </div>
+  </div>
+</form>
+
+<style>
+  .form-label {
+    @apply block text-sm font-medium text-stone-700 mb-2;
+  }
+
+  .form-input {
+    @apply w-full px-4 py-3 rounded-lg border border-stone-300 bg-white text-stone-900;
+    @apply focus:border-forest-500 focus:ring-2 focus:ring-forest-200 focus:outline-none;
+    @apply transition-colors;
+    @apply placeholder:text-stone-400;
+  }
+
+  .form-input.error {
+    @apply border-red-500 focus:border-red-500 focus:ring-red-200;
+  }
+
+  .form-select {
+    @apply w-full px-4 py-3 rounded-lg border border-stone-300 bg-white text-stone-900;
+    @apply focus:border-forest-500 focus:ring-2 focus:ring-forest-200 focus:outline-none;
+    @apply transition-colors appearance-none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.75rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    padding-right: 2.5rem;
+  }
+
+  .form-select.error {
+    @apply border-red-500 focus:border-red-500 focus:ring-red-200;
+  }
+
+  .form-textarea {
+    @apply w-full px-4 py-3 rounded-lg border border-stone-300 bg-white text-stone-900;
+    @apply focus:border-forest-500 focus:ring-2 focus:ring-forest-200 focus:outline-none;
+    @apply transition-colors resize-none;
+    @apply placeholder:text-stone-400;
+  }
+
+  .form-textarea.error {
+    @apply border-red-500 focus:border-red-500 focus:ring-red-200;
+  }
+
+  .form-checkbox {
+    @apply w-5 h-5 rounded border-stone-300 text-forest-600;
+    @apply focus:ring-2 focus:ring-forest-200 focus:ring-offset-0;
+    @apply cursor-pointer;
+  }
+
+  .form-hint {
+    @apply text-sm text-stone-500 mt-1;
+  }
+
+  .form-error {
+    @apply text-sm text-red-600 mt-1;
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('builder-intake-form') as HTMLFormElement;
+    if (!form) return;
+
+    // Set source page URL
+    const sourceUrlInput = document.getElementById('builder_source_page_url') as HTMLInputElement;
+    if (sourceUrlInput) {
+      sourceUrlInput.value = window.location.href;
+    }
+
+    const submitBtn = document.getElementById('builder-submit-btn') as HTMLButtonElement;
+    const submitText = document.getElementById('builder-submit-text');
+    const submitLoading = document.getElementById('builder-submit-loading');
+    const submitIcon = document.getElementById('builder-submit-icon');
+    const formSuccess = document.getElementById('builder-form-success');
+    const formError = document.getElementById('builder-form-error');
+
+    // Validation helper
+    const showError = (fieldId: string, show: boolean) => {
+      const field = document.getElementById(fieldId) as HTMLElement;
+      const error = document.getElementById(`${fieldId}_error`);
+      if (field && error) {
+        if (show) {
+          field.classList.add('error');
+          error.classList.remove('hidden');
+        } else {
+          field.classList.remove('error');
+          error.classList.add('hidden');
+        }
+      }
+    };
+
+    // Check service regions
+    const validateServiceRegions = () => {
+      const checkboxes = form.querySelectorAll('input[name="service_regions"]:checked');
+      const error = document.getElementById('service_regions_error');
+      if (checkboxes.length === 0) {
+        error?.classList.remove('hidden');
+        return false;
+      }
+      error?.classList.add('hidden');
+      return true;
+    };
+
+    // Real-time validation
+    const requiredFields = ['company_name', 'company_type', 'contact_name', 'builder_email', 'builder_phone', 'builder_consent'];
+    requiredFields.forEach(fieldId => {
+      const field = document.getElementById(fieldId);
+      if (field) {
+        field.addEventListener('blur', () => {
+          const value = field instanceof HTMLInputElement && field.type === 'checkbox'
+            ? field.checked
+            : (field as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement).value;
+          showError(fieldId, !value);
+        });
+        field.addEventListener('input', () => {
+          showError(fieldId, false);
+        });
+        field.addEventListener('change', () => {
+          showError(fieldId, false);
+        });
+      }
+    });
+
+    // Email validation
+    const emailField = document.getElementById('builder_email') as HTMLInputElement;
+    if (emailField) {
+      emailField.addEventListener('blur', () => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        showError('builder_email', !emailRegex.test(emailField.value));
+      });
+    }
+
+    // Form submission
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      // Validate all required fields
+      let hasErrors = false;
+      requiredFields.forEach(fieldId => {
+        const field = document.getElementById(fieldId);
+        if (field) {
+          const value = field instanceof HTMLInputElement && field.type === 'checkbox'
+            ? field.checked
+            : (field as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement).value;
+          if (!value) {
+            showError(fieldId, true);
+            hasErrors = true;
+          }
+        }
+      });
+
+      // Email format check
+      if (emailField) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(emailField.value)) {
+          showError('builder_email', true);
+          hasErrors = true;
+        }
+      }
+
+      // Service regions check
+      if (!validateServiceRegions()) {
+        hasErrors = true;
+      }
+
+      if (hasErrors) {
+        // Scroll to first error
+        const firstError = form.querySelector('.error, .form-error:not(.hidden)');
+        if (firstError) {
+          firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        return;
+      }
+
+      // Show loading state
+      submitBtn.disabled = true;
+      submitText?.classList.add('hidden');
+      submitIcon?.classList.add('hidden');
+      submitLoading?.classList.remove('hidden');
+      formError?.classList.add('hidden');
+
+      // Collect form data
+      const formData = new FormData(form);
+      const data: Record<string, any> = {};
+
+      formData.forEach((value, key) => {
+        if (key === 'service_regions' || key === 'project_types' || key === 'interest_type') {
+          if (!data[key]) data[key] = [];
+          data[key].push(value);
+        } else {
+          data[key] = value;
+        }
+      });
+
+      // Convert checkboxes to booleans
+      data.has_liability_insurance = formData.get('has_liability_insurance') === 'yes';
+      data.has_wcb = formData.get('has_wcb') === 'yes';
+      data.is_licensed_builder = formData.get('is_licensed_builder') === 'yes';
+      data.hpo_enrolled = formData.get('hpo_enrolled') === 'yes';
+      data.consent_contact = formData.get('consent_contact') === 'yes';
+
+      try {
+        const webhookUrl = form.dataset.webhookUrl || '';
+        const response = await fetch(webhookUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data),
+        });
+
+        if (response.ok) {
+          // Hide form, show success
+          const formFields = form.querySelector('.space-y-8') as HTMLElement;
+          if (formFields) formFields.classList.add('hidden');
+          formSuccess?.classList.remove('hidden');
+        } else {
+          throw new Error('Form submission failed');
+        }
+      } catch (error) {
+        console.error('Form submission error:', error);
+        formError?.classList.remove('hidden');
+      } finally {
+        // Reset button state
+        submitBtn.disabled = false;
+        submitText?.classList.remove('hidden');
+        submitIcon?.classList.remove('hidden');
+        submitLoading?.classList.add('hidden');
+      }
+    });
+  });
+</script>
