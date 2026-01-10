@@ -1,20 +1,189 @@
 ---
-import PageLayout from '@layouts/PageLayout.astro';
+import BaseLayout from '@layouts/BaseLayout.astro';
 import Container from '@components/Container.astro';
+
+const lastUpdated = 'January 2024';
 ---
 
-<PageLayout
-  title="Terms of Service"
-  description="BuilderNest terms of service"
-  heroTitle="Terms of Service"
-  heroSize="sm"
-  showFooterCta={false}
+<BaseLayout
+  title="Terms of Use | BuilderNest"
+  description="Terms and conditions for using BuilderNest's website and services."
 >
-  <section class="py-12 md:py-16">
-    <Container size="md">
-      <div class="prose max-w-none">
-        <p class="text-stone-500">Terms of service content coming soon.</p>
+  <!-- Hero -->
+  <section class="bg-forest-900 text-white py-12 md:py-16">
+    <Container>
+      <div class="max-w-3xl">
+        <h1 class="text-3xl md:text-4xl font-bold mb-2">Terms of Use</h1>
+        <p class="text-forest-200">Last updated: {lastUpdated}</p>
       </div>
     </Container>
   </section>
-</PageLayout>
+
+  <!-- Content -->
+  <section class="py-12 md:py-16">
+    <Container>
+      <div class="max-w-3xl mx-auto">
+        <article class="prose prose-stone prose-lg max-w-none
+          prose-headings:text-forest-900 prose-headings:font-semibold
+          prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-4
+          prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-3
+          prose-p:text-stone-700 prose-p:leading-relaxed
+          prose-li:text-stone-700
+          prose-a:text-forest-600 prose-a:no-underline hover:prose-a:underline">
+
+          <p class="lead text-lg text-stone-600">
+            Welcome to BuilderNest. By accessing or using our website and services,
+            you agree to be bound by these Terms of Use. Please read them carefully.
+          </p>
+
+          <h2>Acceptance of Terms</h2>
+          <p>
+            By accessing this website or using our services, you agree to these Terms of Use
+            and our Privacy Policy. If you do not agree, please do not use our services.
+          </p>
+
+          <h2>Description of Services</h2>
+          <p>
+            BuilderNest provides documentation, organizational support, and guidance services
+            for individuals undertaking self-build construction projects. Our services include:
+          </p>
+          <ul>
+            <li>Plan library and selection assistance</li>
+            <li>Customization documentation</li>
+            <li>Bid package preparation</li>
+            <li>Construction documentation support</li>
+            <li>Resource materials and guides</li>
+          </ul>
+
+          <h2>Important Limitations</h2>
+          <p>
+            <strong>BuilderNest is not and does not provide:</strong>
+          </p>
+          <ul>
+            <li>General contracting or construction management services</li>
+            <li>Architectural or engineering services</li>
+            <li>Legal, financial, or insurance advice</li>
+            <li>Guarantees of construction outcomes</li>
+            <li>Endorsement of specific contractors or suppliers</li>
+          </ul>
+          <p>
+            We provide support and documentation services. You remain responsible for all
+            decisions regarding your construction project, including hiring qualified
+            professionals as required by law.
+          </p>
+
+          <h2>User Responsibilities</h2>
+          <p>By using our services, you agree to:</p>
+          <ul>
+            <li>Provide accurate and complete information</li>
+            <li>Maintain confidentiality of your account credentials</li>
+            <li>Use our services only for lawful purposes</li>
+            <li>Not misrepresent your relationship with BuilderNest</li>
+            <li>Not reproduce or distribute our proprietary materials without permission</li>
+            <li>Comply with all applicable laws and regulations</li>
+          </ul>
+
+          <h2>Intellectual Property</h2>
+          <p>
+            All content on this website, including text, graphics, logos, images, and software,
+            is the property of BuilderNest or its licensors and is protected by copyright and
+            other intellectual property laws.
+          </p>
+          <p>
+            Plan designs and specifications are licensed for your specific project use only
+            and may not be resold, redistributed, or used for multiple projects without
+            additional licensing.
+          </p>
+
+          <h2>Portal Access</h2>
+          <p>
+            Access to the BuilderNest portal is provided to active clients and authorized
+            users. You are responsible for:
+          </p>
+          <ul>
+            <li>Maintaining the security of your login credentials</li>
+            <li>All activity that occurs under your account</li>
+            <li>Notifying us immediately of any unauthorized access</li>
+          </ul>
+
+          <h2>Payment Terms</h2>
+          <p>
+            Payment terms for specific services are outlined in your service agreement.
+            Generally:
+          </p>
+          <ul>
+            <li>Fees are due as specified in your agreement</li>
+            <li>Prices may change with notice for future services</li>
+            <li>Refund policies are specified in individual service agreements</li>
+          </ul>
+
+          <h2>Limitation of Liability</h2>
+          <p>
+            To the fullest extent permitted by law, BuilderNest shall not be liable for:
+          </p>
+          <ul>
+            <li>Any indirect, incidental, special, or consequential damages</li>
+            <li>Construction defects, delays, or cost overruns</li>
+            <li>Actions or omissions of contractors, suppliers, or other third parties</li>
+            <li>Decisions made based on information provided through our services</li>
+            <li>Loss of data or business interruption</li>
+          </ul>
+          <p>
+            Our total liability for any claim shall not exceed the amount you paid for
+            the specific service giving rise to the claim.
+          </p>
+
+          <h2>Indemnification</h2>
+          <p>
+            You agree to indemnify and hold BuilderNest harmless from any claims, damages,
+            or expenses arising from your use of our services, violation of these terms,
+            or infringement of any third-party rights.
+          </p>
+
+          <h2>Disclaimer of Warranties</h2>
+          <p>
+            Our services are provided "as is" without warranties of any kind, either express
+            or implied. We do not warrant that our services will meet your specific requirements
+            or that they will be uninterrupted or error-free.
+          </p>
+
+          <h2>Termination</h2>
+          <p>
+            We reserve the right to suspend or terminate your access to our services at our
+            discretion, with or without notice, for conduct that violates these terms or is
+            harmful to other users or our business.
+          </p>
+
+          <h2>Governing Law</h2>
+          <p>
+            These terms are governed by the laws of British Columbia, Canada. Any disputes
+            shall be resolved in the courts of British Columbia.
+          </p>
+
+          <h2>Changes to Terms</h2>
+          <p>
+            We may modify these terms at any time. Changes will be posted on this page.
+            Continued use of our services after changes constitutes acceptance of the
+            modified terms.
+          </p>
+
+          <h2>Severability</h2>
+          <p>
+            If any provision of these terms is found to be unenforceable, the remaining
+            provisions will continue in effect.
+          </p>
+
+          <h2>Contact</h2>
+          <p>
+            Questions about these Terms of Use should be directed to:
+          </p>
+          <ul>
+            <li>Email: <a href="mailto:legal@buildernest.ca">legal@buildernest.ca</a></li>
+            <li>Mail: BuilderNest, Prince George, BC</li>
+          </ul>
+
+        </article>
+      </div>
+    </Container>
+  </section>
+</BaseLayout>

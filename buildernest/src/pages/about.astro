@@ -1,17 +1,213 @@
 ---
-import PageLayout from '@layouts/PageLayout.astro';
+import BaseLayout from '@layouts/BaseLayout.astro';
 import Container from '@components/Container.astro';
+import SectionHeading from '@components/SectionHeading.astro';
+import Button from '@components/Button.astro';
+import Icon from '@components/Icon.astro';
+import CTABand from '@components/CTABand.astro';
+
+const principles = [
+  {
+    title: 'Start with Proven Plans',
+    description: 'Custom design is expensive and risky. We start with plans that work, then customize thoughtfully.'
+  },
+  {
+    title: 'Document Everything',
+    description: 'Clear specifications prevent disputes. If it\'s not written down, it didn\'t happen.'
+  },
+  {
+    title: 'Compare Apples to Apples',
+    description: 'Structured bid packages mean you can actually compare quotes. No more guessing what\'s included.'
+  },
+  {
+    title: 'Build for the Climate',
+    description: 'Northern BC demands designs and specifications that account for our conditions. Generic won\'t cut it.'
+  },
+  {
+    title: 'Support, Don\'t Replace',
+    description: 'We help you work with professionals effectively. We don\'t replace architects, engineers, or builders.'
+  },
+  {
+    title: 'Practical Over Perfect',
+    description: 'A well-executed 80% solution beats a theoretically perfect plan that never gets built.'
+  }
+];
 ---
 
-<PageLayout
-  title="About"
-  description="Learn about BuilderNest and our mission to make home building accessible in northern BC"
-  heroTitle="About BuilderNest"
-  heroSubtitle="Our mission is to make home building accessible and achievable in northern BC"
+<BaseLayout
+  title="About BuilderNest | BuilderNest"
+  description="Learn about BuilderNest's mission to make home building accessible and achievable in northern BC."
 >
-  <section class="py-12 md:py-16">
-    <Container size="md">
-      <p class="text-stone-500">Content coming soon.</p>
+  <!-- Hero -->
+  <section class="bg-forest-900 text-white py-16 md:py-20">
+    <Container>
+      <div class="max-w-3xl">
+        <h1 class="text-4xl md:text-5xl font-bold mb-4">About BuilderNest</h1>
+        <p class="text-xl text-forest-100">
+          Structured support for people building homes in northern British Columbia.
+        </p>
+      </div>
     </Container>
   </section>
-</PageLayout>
+
+  <!-- Why BuilderNest Exists -->
+  <section class="py-16 md:py-24">
+    <Container>
+      <div class="max-w-3xl mx-auto">
+        <h2 class="text-3xl font-bold text-forest-900 mb-6">Why BuilderNest Exists</h2>
+
+        <div class="prose prose-stone prose-lg max-w-none">
+          <p>
+            Building a home in northern BC shouldn't require becoming an expert in construction management,
+            procurement, and documentation. But for most people doing a self-build, that's exactly what happens.
+          </p>
+
+          <p>
+            We've seen smart, capable people struggle not because they couldn't make good decisions,
+            but because they didn't have the right information organized the right way at the right time.
+          </p>
+
+          <p>
+            They get quotes that can't be compared. They discover scope gaps after contracts are signed.
+            They lose track of decisions and documentation. They spend their time managing chaos instead
+            of enjoying their build.
+          </p>
+
+          <p>
+            BuilderNest exists to change that. We provide the structure, documentation, and guidance
+            that makes self-builds manageable—without taking over or replacing the professionals you need.
+          </p>
+        </div>
+      </div>
+    </Container>
+  </section>
+
+  <!-- Our Approach -->
+  <section class="py-16 md:py-24 bg-cream-50">
+    <Container>
+      <SectionHeading
+        title="Our Approach"
+        subtitle="Principles that guide how we work with clients."
+        centered
+      />
+
+      <div class="mt-12 grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {principles.map((principle) => (
+          <div class="bg-white rounded-xl p-6 shadow-soft">
+            <h3 class="text-lg font-semibold text-forest-900 mb-2">{principle.title}</h3>
+            <p class="text-stone-600">{principle.description}</p>
+          </div>
+        ))}
+      </div>
+    </Container>
+  </section>
+
+  <!-- What We're Not -->
+  <section class="py-16 md:py-24">
+    <Container>
+      <div class="max-w-3xl mx-auto">
+        <h2 class="text-3xl font-bold text-forest-900 mb-6">What We're Not</h2>
+
+        <div class="space-y-4">
+          <div class="flex items-start gap-4 p-4 bg-stone-50 rounded-lg">
+            <div class="w-8 h-8 bg-stone-200 rounded-full flex items-center justify-center shrink-0 mt-0.5">
+              <Icon name="x" size="sm" />
+            </div>
+            <div>
+              <h4 class="font-semibold text-forest-900">Not a General Contractor</h4>
+              <p class="text-stone-600 text-sm">We don't hire trades, manage construction schedules, or take responsibility for the build itself.</p>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-4 p-4 bg-stone-50 rounded-lg">
+            <div class="w-8 h-8 bg-stone-200 rounded-full flex items-center justify-center shrink-0 mt-0.5">
+              <Icon name="x" size="sm" />
+            </div>
+            <div>
+              <h4 class="font-semibold text-forest-900">Not an Architecture Firm</h4>
+              <p class="text-stone-600 text-sm">We work with existing plans and can facilitate customization, but we don't provide architectural services.</p>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-4 p-4 bg-stone-50 rounded-lg">
+            <div class="w-8 h-8 bg-stone-200 rounded-full flex items-center justify-center shrink-0 mt-0.5">
+              <Icon name="x" size="sm" />
+            </div>
+            <div>
+              <h4 class="font-semibold text-forest-900">Not an Engineering Firm</h4>
+              <p class="text-stone-600 text-sm">Structural, geotechnical, and civil engineering are done by licensed professionals we help you engage.</p>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-4 p-4 bg-stone-50 rounded-lg">
+            <div class="w-8 h-8 bg-stone-200 rounded-full flex items-center justify-center shrink-0 mt-0.5">
+              <Icon name="x" size="sm" />
+            </div>
+            <div>
+              <h4 class="font-semibold text-forest-900">Not a Lender</h4>
+              <p class="text-stone-600 text-sm">We help you prepare for construction financing, but we don't provide loans or financial advice.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-8 p-6 bg-forest-50 rounded-xl">
+          <p class="text-forest-900">
+            <strong>What we are:</strong> A documentation and support service that helps you work effectively
+            with all of these professionals. We organize, we guide, we structure. You and your team build.
+          </p>
+        </div>
+      </div>
+    </Container>
+  </section>
+
+  <!-- Team Placeholder -->
+  <section class="py-16 md:py-24 bg-cream-50">
+    <Container>
+      <div class="max-w-3xl mx-auto text-center">
+        <h2 class="text-3xl font-bold text-forest-900 mb-4">The Team</h2>
+        <p class="text-stone-600 text-lg mb-8">
+          BuilderNest is built by people who understand northern BC construction—the climate,
+          the logistics, the contractors, and the challenges unique to building here.
+        </p>
+
+        <div class="bg-white rounded-xl p-8 shadow-soft inline-block">
+          <div class="w-24 h-24 bg-stone-100 rounded-full mx-auto mb-4 flex items-center justify-center">
+            <Icon name="users" size="xl" />
+          </div>
+          <p class="text-stone-500">Team profiles coming soon</p>
+        </div>
+      </div>
+    </Container>
+  </section>
+
+  <!-- Partners Placeholder -->
+  <section class="py-16 md:py-24">
+    <Container>
+      <div class="max-w-3xl mx-auto text-center">
+        <h2 class="text-3xl font-bold text-forest-900 mb-4">Partners</h2>
+        <p class="text-stone-600 text-lg mb-8">
+          We work with trusted professionals across northern BC—designers, engineers, lenders,
+          and builders who share our commitment to well-documented, well-executed projects.
+        </p>
+
+        <div class="flex flex-wrap justify-center gap-8">
+          {[1, 2, 3, 4].map((i) => (
+            <div class="w-32 h-16 bg-stone-100 rounded-lg flex items-center justify-center">
+              <span class="text-stone-400 text-sm">Partner {i}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </Container>
+  </section>
+
+  <!-- CTA Band -->
+  <CTABand
+    heading="Ready to start your project?"
+    description="Let's talk about your goals and see how BuilderNest can help."
+    primaryButtonText="Contact Us"
+    primaryButtonHref="/contact"
+    secondaryButtonText="Browse Plans"
+    secondaryButtonHref="/plans"
+  />
+</BaseLayout>

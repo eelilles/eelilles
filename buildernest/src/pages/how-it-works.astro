@@ -1,17 +1,276 @@
 ---
-import PageLayout from '@layouts/PageLayout.astro';
+import BaseLayout from '@layouts/BaseLayout.astro';
 import Container from '@components/Container.astro';
+import SectionHeading from '@components/SectionHeading.astro';
+import Icon from '@components/Icon.astro';
+import CTABand from '@components/CTABand.astro';
+
+const stages = [
+  {
+    number: 1,
+    title: 'Inquiry',
+    description: 'Tell us about your project. We\'ll discuss your goals, timeline, and budget to understand if BuilderNest is the right fit.',
+    icon: 'chat'
+  },
+  {
+    number: 2,
+    title: 'Plan Selection',
+    description: 'Browse our plan library and select a design that fits your needs. We\'ll help you evaluate options against your site and budget.',
+    icon: 'home'
+  },
+  {
+    number: 3,
+    title: 'Customization',
+    description: 'Make the plan yours. We document your modifications, finish selections, and option choices to create complete specifications.',
+    icon: 'document'
+  },
+  {
+    number: 4,
+    title: 'Bid',
+    description: 'Receive structured bid packages that let you compare quotes fairly. We help you evaluate responses and finalize contracts.',
+    icon: 'cube'
+  },
+  {
+    number: 5,
+    title: 'Construction',
+    description: 'Track progress, document everything, and resolve issues as they arise. Your portal keeps all project information organized.',
+    icon: 'clipboard-check'
+  }
+];
+
+const roles = [
+  {
+    role: 'You (Owner)',
+    responsibilities: [
+      'Make design and material decisions',
+      'Approve budgets and changes',
+      'Select and hire contractors',
+      'Pay invoices and draws',
+      'Provide site access',
+      'Final inspections and acceptance'
+    ]
+  },
+  {
+    role: 'Builder / Trades',
+    responsibilities: [
+      'Execute construction work',
+      'Manage subcontractors (if GC)',
+      'Maintain schedule',
+      'Ensure code compliance',
+      'Request inspections',
+      'Warranty work'
+    ]
+  },
+  {
+    role: 'BuilderNest',
+    responsibilities: [
+      'Plan and specification development',
+      'Bid package preparation',
+      'Document organization',
+      'Progress tracking support',
+      'Q&A facilitation',
+      'Resource and guidance'
+    ]
+  },
+  {
+    role: 'AHJ (Authority)',
+    responsibilities: [
+      'Building permit review',
+      'Plan approval',
+      'Required inspections',
+      'Occupancy permit',
+      'Code interpretation',
+      'Enforcement'
+    ]
+  }
+];
 ---
 
-<PageLayout
-  title="How it Works"
-  description="Learn how BuilderNest helps you plan and build your home in northern BC"
-  heroTitle="How it Works"
-  heroSubtitle="From plan selection to construction, we guide you through every step"
+<BaseLayout
+  title="How it Works | BuilderNest"
+  description="Learn how BuilderNest guides you from plan selection through construction with structured support at every stage."
 >
-  <section class="py-12 md:py-16">
-    <Container size="md">
-      <p class="text-stone-500">Content coming soon.</p>
+  <!-- Hero -->
+  <section class="bg-forest-900 text-white py-16 md:py-20">
+    <Container>
+      <div class="max-w-3xl">
+        <h1 class="text-4xl md:text-5xl font-bold mb-4">How it Works</h1>
+        <p class="text-xl text-forest-100">
+          From initial inquiry to move-in day, we provide structured support at every stage of your self-build project.
+        </p>
+      </div>
     </Container>
   </section>
-</PageLayout>
+
+  <!-- Process Stages -->
+  <section class="py-16 md:py-24">
+    <Container>
+      <SectionHeading
+        title="Five Stages to Your New Home"
+        subtitle="Each stage builds on the last, with clear deliverables and decision points."
+        centered
+      />
+
+      <!-- Desktop: Horizontal flow -->
+      <div class="hidden lg:block mt-16">
+        <div class="flex items-start justify-between relative">
+          <!-- Connecting line -->
+          <div class="absolute top-12 left-0 right-0 h-0.5 bg-stone-200" style="left: 10%; right: 10%;"></div>
+
+          {stages.map((stage, index) => (
+            <div class="relative flex flex-col items-center text-center w-1/5 px-2">
+              <!-- Number circle -->
+              <div class="w-24 h-24 rounded-full bg-forest-600 text-white flex items-center justify-center text-3xl font-bold relative z-10 shadow-lg">
+                {stage.number}
+              </div>
+
+              <!-- Title -->
+              <h3 class="text-lg font-semibold text-forest-900 mt-6 mb-2">{stage.title}</h3>
+
+              <!-- Description -->
+              <p class="text-sm text-stone-600">{stage.description}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <!-- Mobile: Vertical flow -->
+      <div class="lg:hidden mt-12 space-y-8">
+        {stages.map((stage, index) => (
+          <div class="flex gap-6">
+            <div class="flex flex-col items-center">
+              <div class="w-16 h-16 rounded-full bg-forest-600 text-white flex items-center justify-center text-2xl font-bold shrink-0">
+                {stage.number}
+              </div>
+              {index < stages.length - 1 && (
+                <div class="w-0.5 bg-stone-200 flex-grow mt-4"></div>
+              )}
+            </div>
+            <div class="pt-2 pb-6">
+              <h3 class="text-lg font-semibold text-forest-900 mb-2">{stage.title}</h3>
+              <p class="text-stone-600">{stage.description}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </Container>
+  </section>
+
+  <!-- Where Documents Live -->
+  <section class="py-16 md:py-24 bg-cream-50">
+    <Container>
+      <SectionHeading
+        title="Where Documents Live"
+        subtitle="Understanding what's public vs. what's in your private portal."
+        centered
+      />
+
+      <div class="mt-12 grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+        <!-- Public Website -->
+        <div class="bg-white rounded-xl p-8 shadow-soft">
+          <div class="w-12 h-12 bg-forest-100 rounded-lg flex items-center justify-center mb-4">
+            <Icon name="globe" size="lg" />
+          </div>
+          <h3 class="text-xl font-semibold text-forest-900 mb-3">Public Website</h3>
+          <p class="text-stone-600 mb-4">Freely available to everyone browsing our site.</p>
+          <ul class="space-y-2 text-stone-700">
+            <li class="flex items-start gap-2">
+              <Icon name="check" size="sm" class="text-forest-600 mt-1 shrink-0" />
+              <span>Plan library with images and specs</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <Icon name="check" size="sm" class="text-forest-600 mt-1 shrink-0" />
+              <span>Module descriptions and pricing</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <Icon name="check" size="sm" class="text-forest-600 mt-1 shrink-0" />
+              <span>Free resource guides and checklists</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <Icon name="check" size="sm" class="text-forest-600 mt-1 shrink-0" />
+              <span>General how-to information</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Private Portal -->
+        <div class="bg-white rounded-xl p-8 shadow-soft border-2 border-forest-200">
+          <div class="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center mb-4">
+            <Icon name="lock" size="lg" />
+          </div>
+          <h3 class="text-xl font-semibold text-forest-900 mb-3">Your Private Portal</h3>
+          <p class="text-stone-600 mb-4">Secure access for active BuilderNest clients.</p>
+          <ul class="space-y-2 text-stone-700">
+            <li class="flex items-start gap-2">
+              <Icon name="check" size="sm" class="text-amber-600 mt-1 shrink-0" />
+              <span>Your customized plans and specifications</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <Icon name="check" size="sm" class="text-amber-600 mt-1 shrink-0" />
+              <span>Bid packages and contractor documents</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <Icon name="check" size="sm" class="text-amber-600 mt-1 shrink-0" />
+              <span>Construction progress and photos</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <Icon name="check" size="sm" class="text-amber-600 mt-1 shrink-0" />
+              <span>Q&A history and issue tracking</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <Icon name="check" size="sm" class="text-amber-600 mt-1 shrink-0" />
+              <span>Financial tracking and draw schedules</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </Container>
+  </section>
+
+  <!-- Who Does What -->
+  <section class="py-16 md:py-24">
+    <Container>
+      <SectionHeading
+        title="Who Does What"
+        subtitle="Clear roles make for smoother projects. Here's how responsibilities are typically divided."
+        centered
+      />
+
+      <div class="mt-12 grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {roles.map((item) => (
+          <div class="bg-white rounded-xl p-6 shadow-soft border border-stone-100">
+            <h3 class="text-lg font-semibold text-forest-900 mb-4 pb-4 border-b border-stone-100">
+              {item.role}
+            </h3>
+            <ul class="space-y-2">
+              {item.responsibilities.map((resp) => (
+                <li class="flex items-start gap-2 text-sm text-stone-600">
+                  <span class="text-forest-500 mt-0.5">•</span>
+                  <span>{resp}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+
+      <div class="mt-12 bg-forest-50 rounded-xl p-6 md:p-8 max-w-3xl mx-auto">
+        <h4 class="font-semibold text-forest-900 mb-2">Important Note</h4>
+        <p class="text-stone-700">
+          BuilderNest provides documentation, guidance, and organizational support. We are not general contractors,
+          architects, or engineers. We help you work effectively with those professionals, but we don't replace them.
+        </p>
+      </div>
+    </Container>
+  </section>
+
+  <!-- CTA Band -->
+  <CTABand
+    heading="Ready to get started?"
+    description="Let's discuss your project and see if BuilderNest is the right fit."
+    primaryButtonText="Contact Us"
+    primaryButtonHref="/contact"
+    secondaryButtonText="Browse Plans"
+    secondaryButtonHref="/plans"
+  />
+</BaseLayout>

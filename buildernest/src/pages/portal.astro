@@ -1,19 +1,181 @@
 ---
-import PageLayout from '@layouts/PageLayout.astro';
+import BaseLayout from '@layouts/BaseLayout.astro';
 import Container from '@components/Container.astro';
+import SectionHeading from '@components/SectionHeading.astro';
+import Button from '@components/Button.astro';
+import Icon from '@components/Icon.astro';
+
+const portalFeatures = [
+  {
+    icon: 'document',
+    title: 'Access Your Documents',
+    description: 'Plans, specifications, contracts, and permits — all in one place.'
+  },
+  {
+    icon: 'camera',
+    title: 'Photo Documentation',
+    description: 'Upload and organize construction photos with automatic date tracking.'
+  },
+  {
+    icon: 'clipboard-check',
+    title: 'Track Progress',
+    description: 'See milestone completion, upcoming tasks, and project timeline.'
+  },
+  {
+    icon: 'chat',
+    title: 'Q&A Management',
+    description: 'Ask questions, get answers, and keep a searchable history.'
+  },
+  {
+    icon: 'calculator',
+    title: 'Financial Tracking',
+    description: 'Monitor budget, track draws, and review change orders.'
+  },
+  {
+    icon: 'users',
+    title: 'Team Coordination',
+    description: 'Share access with your builder and keep everyone aligned.'
+  }
+];
+
+const audiences = [
+  {
+    title: 'Active BuilderNest Clients',
+    description: 'If you\'re working with us on a project, the portal is your central hub for all project information and communication.'
+  },
+  {
+    title: 'Builders and Trades',
+    description: 'Contractors can access relevant project documents, upload progress photos, and respond to questions through limited portal access.'
+  }
+];
 ---
 
-<PageLayout
-  title="Portal Login"
-  description="Access your BuilderNest account"
-  heroTitle="Portal Login"
-  heroSubtitle="Access your account to manage your build projects"
-  heroSize="sm"
-  showFooterCta={false}
+<BaseLayout
+  title="BuilderNest Portal | BuilderNest"
+  description="Access your BuilderNest project portal to manage documents, track progress, and coordinate your build."
 >
-  <section class="py-12 md:py-16">
-    <Container size="sm">
-      <p class="text-stone-500">Login form coming soon.</p>
+  <!-- Hero -->
+  <section class="bg-forest-900 text-white py-16 md:py-20">
+    <Container>
+      <div class="max-w-3xl">
+        <h1 class="text-4xl md:text-5xl font-bold mb-4">BuilderNest Portal</h1>
+        <p class="text-xl text-forest-100">
+          Your secure project hub for documents, progress tracking, and team coordination.
+        </p>
+      </div>
     </Container>
   </section>
-</PageLayout>
+
+  <!-- Portal Login Section -->
+  <section class="py-16 md:py-20">
+    <Container>
+      <div class="grid lg:grid-cols-2 gap-12 items-center">
+        <!-- Login Card -->
+        <div class="bg-white rounded-2xl shadow-lifted p-8 md:p-10 border border-stone-100">
+          <div class="w-16 h-16 bg-forest-100 rounded-xl flex items-center justify-center mb-6">
+            <Icon name="lock" size="xl" />
+          </div>
+          <h2 class="text-2xl font-bold text-forest-900 mb-3">Access Your Portal</h2>
+          <p class="text-stone-600 mb-8">
+            Log in to view your project documents, track progress, and communicate with your team.
+          </p>
+
+          <a
+            href="https://portal.buildernest.ca"
+            class="inline-flex items-center justify-center gap-2 w-full bg-forest-600 hover:bg-forest-700 text-white font-semibold py-4 px-6 rounded-lg transition-colors text-lg"
+          >
+            <Icon name="arrow-right" size="md" />
+            Portal Login
+          </a>
+
+          <p class="text-sm text-stone-500 mt-4 text-center">
+            Secure login powered by Glide
+          </p>
+        </div>
+
+        <!-- Screenshot Placeholder -->
+        <div class="bg-stone-100 rounded-2xl aspect-[4/3] flex items-center justify-center">
+          <div class="text-center p-8">
+            <div class="w-16 h-16 bg-stone-200 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Icon name="camera" size="lg" />
+            </div>
+            <p class="text-stone-500 font-medium">Portal Screenshot</p>
+            <p class="text-stone-400 text-sm mt-1">Coming soon</p>
+          </div>
+        </div>
+      </div>
+    </Container>
+  </section>
+
+  <!-- What You Can Do -->
+  <section class="py-16 md:py-20 bg-cream-50">
+    <Container>
+      <SectionHeading
+        title="What You Can Do in the Portal"
+        subtitle="Everything you need to manage your build, organized and accessible."
+        centered
+      />
+
+      <div class="mt-12 grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {portalFeatures.map((feature) => (
+          <div class="bg-white rounded-xl p-6 shadow-soft">
+            <div class="w-12 h-12 bg-forest-100 rounded-lg flex items-center justify-center mb-4">
+              <Icon name={feature.icon} size="lg" />
+            </div>
+            <h3 class="text-lg font-semibold text-forest-900 mb-2">{feature.title}</h3>
+            <p class="text-stone-600 text-sm">{feature.description}</p>
+          </div>
+        ))}
+      </div>
+    </Container>
+  </section>
+
+  <!-- Who It's For -->
+  <section class="py-16 md:py-20">
+    <Container>
+      <div class="max-w-3xl mx-auto">
+        <SectionHeading
+          title="Who It's For"
+          centered
+        />
+
+        <div class="mt-10 space-y-6">
+          {audiences.map((audience) => (
+            <div class="bg-white rounded-xl p-6 border border-stone-200">
+              <h3 class="text-lg font-semibold text-forest-900 mb-2">{audience.title}</h3>
+              <p class="text-stone-600">{audience.description}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </Container>
+  </section>
+
+  <!-- Request Access -->
+  <section class="py-16 md:py-20 bg-forest-900 text-white">
+    <Container>
+      <div class="max-w-2xl mx-auto text-center">
+        <h2 class="text-3xl font-bold mb-4">Need Portal Access?</h2>
+        <p class="text-forest-100 text-lg mb-8">
+          If you're an active BuilderNest client or a builder working on a BuilderNest project,
+          we can set up your portal access.
+        </p>
+
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <a
+            href="/contact?subject=portal-access"
+            class="inline-flex items-center justify-center gap-2 bg-white text-forest-900 hover:bg-cream-50 font-semibold py-3 px-6 rounded-lg transition-colors"
+          >
+            Request Access
+          </a>
+          <a
+            href="/how-it-works"
+            class="inline-flex items-center justify-center gap-2 bg-forest-800 hover:bg-forest-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+          >
+            Learn How It Works
+          </a>
+        </div>
+      </div>
+    </Container>
+  </section>
+</BaseLayout>
