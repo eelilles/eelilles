@@ -1,12 +1,15 @@
 ---
 import PageLayout from '@layouts/PageLayout.astro';
+import Container from '@components/Container.astro';
 ---
 
 <PageLayout title="BuilderNest" description="Plan-to-build housing platform for northern BC">
-  <section class="container py-16 md:py-24">
-    <h1 class="text-neutral-900">BuilderNest</h1>
-    <p class="mt-4 max-w-2xl text-lg text-neutral-600">
-      Plan-to-build housing platform for northern BC
-    </p>
+  <section class="py-16 md:py-24">
+    <Container>
+      <h1 class="text-stone-900">BuilderNest</h1>
+      <p class="mt-4 max-w-2xl text-lg text-stone-600">
+        Plan-to-build housing platform for northern BC
+      </p>
+    </Container>
   </section>
 </PageLayout>

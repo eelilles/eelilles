@@ -1,0 +1,33 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+interface Props extends HTMLAttributes<'div'> {
+  size?: 'sm' | 'md' | 'lg' | 'xl' | 'full';
+  as?: 'div' | 'section' | 'article' | 'main';
+}
+
+const {
+  size = 'lg',
+  as: Tag = 'div',
+  class: className,
+  ...attrs
+} = Astro.props;
+
+const sizes = {
+  sm: 'max-w-3xl',
+  md: 'max-w-5xl',
+  lg: 'max-w-7xl',
+  xl: 'max-w-screen-2xl',
+  full: 'max-w-full'
+};
+
+const classes = [
+  'mx-auto px-4 sm:px-6 lg:px-8',
+  sizes[size],
+  className
+].filter(Boolean).join(' ');
+---
+
+<Tag class={classes} {...attrs}>
+  <slot />
+</Tag>

@@ -1,0 +1,33 @@
+---
+import Container from './Container.astro';
+
+interface Props {
+  variant?: 'forest' | 'cream' | 'amber';
+  class?: string;
+}
+
+const {
+  variant = 'forest',
+  class: className
+} = Astro.props;
+
+const variants = {
+  forest: 'bg-forest-800 text-white',
+  cream: 'bg-cream-100 text-stone-900 border-y border-stone-200',
+  amber: 'bg-amber-50 text-stone-900 border-y border-amber-200'
+};
+
+const classes = [
+  'py-16 md:py-20',
+  variants[variant],
+  className
+].filter(Boolean).join(' ');
+---
+
+<section class={classes}>
+  <Container size="lg">
+    <div class="text-center">
+      <slot />
+    </div>
+  </Container>
+</section>

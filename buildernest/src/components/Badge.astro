@@ -1,0 +1,38 @@
+---
+interface Props {
+  variant?: 'default' | 'forest' | 'amber' | 'outline';
+  size?: 'sm' | 'md';
+  class?: string;
+}
+
+const {
+  variant = 'default',
+  size = 'sm',
+  class: className
+} = Astro.props;
+
+const baseStyles = 'inline-flex items-center font-medium rounded-full';
+
+const variants = {
+  default: 'bg-stone-100 text-stone-700',
+  forest: 'bg-forest-100 text-forest-800',
+  amber: 'bg-amber-100 text-amber-800',
+  outline: 'bg-transparent border border-stone-300 text-stone-600'
+};
+
+const sizes = {
+  sm: 'px-2.5 py-0.5 text-xs',
+  md: 'px-3 py-1 text-sm'
+};
+
+const classes = [
+  baseStyles,
+  variants[variant],
+  sizes[size],
+  className
+].filter(Boolean).join(' ');
+---
+
+<span class={classes}>
+  <slot />
+</span>

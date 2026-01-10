@@ -1,27 +1,43 @@
 ---
 import PageLayout from '@layouts/PageLayout.astro';
+import Container from '@components/Container.astro';
+import Card from '@components/Card.astro';
+import SectionHeading from '@components/SectionHeading.astro';
+import Badge from '@components/Badge.astro';
 import { getCollection } from 'astro:content';
 
 const plans = await getCollection('plans', ({ data }) => !data.draft);
 ---
 
 <PageLayout title="Plans" description="Browse housing plans for northern BC">
-  <section class="container py-16">
-    <h1 class="text-neutral-900">Plans</h1>
-    <p class="mt-4 text-lg text-neutral-600">
-      Browse available housing plans
-    </p>
-    {plans.length > 0 ? (
-      <div class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {plans.map((plan) => (
-          <a href={`/plans/${plan.slug}`} class="card no-underline hover:shadow-md transition-shadow">
-            <h3 class="text-neutral-900">{plan.data.title}</h3>
-            <p class="mt-2 text-sm text-neutral-600">{plan.data.description}</p>
-          </a>
-        ))}
-      </div>
-    ) : (
-      <p class="mt-8 text-neutral-500">No plans available yet.</p>
-    )}
+  <section class="py-16">
+    <Container>
+      <SectionHeading
+        title="Plans"
+        subtitle="Browse available housing plans"
+      />
+      {plans.length > 0 ? (
+        <div class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {plans.map((plan) => (
+            <Card href={`/plans/${plan.slug}`}>
+              <h3 class="text-stone-900">{plan.data.title}</h3>
+              <p class="mt-2 text-sm text-stone-600">{plan.data.description}</p>
+              {(plan.data.squareFeet || plan.data.bedrooms) && (
+                <div class="mt-4 flex flex-wrap gap-2">
+                  {plan.data.squareFeet && (
+                    <Badge>{plan.data.squareFeet} sq ft</Badge>
+                  )}
+                  {plan.data.bedrooms && (
+                    <Badge>{plan.data.bedrooms} bed</Badge>
+                  )}
+                </div>
+              )}
+            </Card>
+          ))}
+        </div>
+      ) : (
+        <p class="mt-8 text-stone-500">No plans available yet.</p>
+      )}
+    </Container>
   </section>
 </PageLayout>

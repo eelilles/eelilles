@@ -1,4 +1,6 @@
 ---
+import Container from './Container.astro';
+
 const navItems = [
   { href: '/', label: 'Home' },
   { href: '/plans', label: 'Plans' },
@@ -9,13 +11,13 @@ const navItems = [
 const currentPath = Astro.url.pathname;
 ---
 
-<header class="border-b border-neutral-200 bg-white">
-  <nav class="container">
+<header class="border-b border-stone-200 bg-white">
+  <Container as="nav">
     <div class="flex h-16 items-center justify-between">
-      <a href="/" class="text-xl font-bold text-neutral-900 no-underline hover:text-primary-600">
+      <a href="/" class="text-xl font-bold text-forest-800 no-underline hover:text-forest-600 transition-colors">
         BuilderNest
       </a>
-      <ul class="hidden items-center gap-6 sm:flex">
+      <ul class="hidden items-center gap-8 sm:flex">
         {navItems.map((item) => (
           <li>
             <a
@@ -23,8 +25,8 @@ const currentPath = Astro.url.pathname;
               class:list={[
                 'text-sm font-medium no-underline transition-colors',
                 currentPath === item.href
-                  ? 'text-primary-600'
-                  : 'text-neutral-600 hover:text-neutral-900'
+                  ? 'text-forest-700'
+                  : 'text-stone-600 hover:text-stone-900'
               ]}
             >
               {item.label}
@@ -34,7 +36,7 @@ const currentPath = Astro.url.pathname;
       </ul>
       <button
         type="button"
-        class="sm:hidden p-2 text-neutral-600 hover:text-neutral-900"
+        class="sm:hidden p-2 text-stone-600 hover:text-stone-900 transition-colors"
         aria-label="Toggle menu"
         id="mobile-menu-button"
       >
@@ -43,25 +45,27 @@ const currentPath = Astro.url.pathname;
         </svg>
       </button>
     </div>
-  </nav>
-  <div class="hidden border-t border-neutral-200 sm:hidden" id="mobile-menu">
-    <ul class="container py-4 space-y-2">
-      {navItems.map((item) => (
-        <li>
-          <a
-            href={item.href}
-            class:list={[
-              'block py-2 text-sm font-medium no-underline',
-              currentPath === item.href
-                ? 'text-primary-600'
-                : 'text-neutral-600 hover:text-neutral-900'
-            ]}
-          >
-            {item.label}
-          </a>
-        </li>
-      ))}
-    </ul>
+  </Container>
+  <div class="hidden border-t border-stone-200 sm:hidden" id="mobile-menu">
+    <Container>
+      <ul class="py-4 space-y-1">
+        {navItems.map((item) => (
+          <li>
+            <a
+              href={item.href}
+              class:list={[
+                'block py-2 text-sm font-medium no-underline transition-colors rounded-lg px-3 -mx-3',
+                currentPath === item.href
+                  ? 'text-forest-700 bg-forest-50'
+                  : 'text-stone-600 hover:text-stone-900 hover:bg-stone-50'
+              ]}
+            >
+              {item.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </Container>
   </div>
 </header>
 
