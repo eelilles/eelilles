@@ -17,22 +17,22 @@ const plans = defineCollection({
   schema: z.object({
     // Basic info
     name: z.string(),
-    slug: z.string().optional(), // Auto-generated from filename if not provided
-    summary: z.string().min(100).max(250), // 160-220 chars target
+    slug: z.string().optional(),
+    summary: z.string().min(100).max(250),
 
     // Media
     heroImage: z.string().optional(),
     gallery: z.array(z.string()).default([]),
 
     // Specs
-    floorArea: z.number(), // in sq ft
+    floorArea: z.number(),
     bedrooms: z.number().min(0).max(6),
     bathrooms: z.number().min(0).max(4),
     stories: z.number().min(1).max(3).default(1),
 
     // Classification
     planType: planTypeEnum,
-    styleTags: z.array(z.string()).default([]), // modern, cabin-modern, shed, gable, etc.
+    styleTags: z.array(z.string()).default([]),
 
     // Site requirements
     foundationOptions: z.array(foundationEnum).default(['slab']),
@@ -47,13 +47,13 @@ const plans = defineCollection({
     draft: z.boolean().default(false),
 
     // Related content
-    recommendedModules: z.array(z.string()).default([]), // module slugs
+    recommendedModules: z.array(z.string()).default([]),
 
-    // Inclusions text (what you get)
-    publicInclusions: z.string().optional(), // Shown to everyone
-    portalInclusions: z.string().optional(), // Shown to portal users only
+    // Inclusions text
+    publicInclusions: z.string().optional(),
+    portalInclusions: z.string().optional(),
 
-    // FAQ items for this plan
+    // FAQ items
     faq: z.array(z.object({
       question: z.string(),
       answer: z.string()
@@ -68,15 +68,47 @@ const plans = defineCollection({
 const modules = defineCollection({
   type: 'content',
   schema: z.object({
-    title: z.string(),
-    description: z.string(),
-    category: z.string().optional(),
+    // Basic info
+    name: z.string(),
+    slug: z.string().optional(),
+    icon: z.string(), // Icon component name (e.g., 'document', 'cube', 'bolt')
+    summary: z.string(), // One-line summary
+
+    // Problem/solution framing
+    problem: z.string(), // The problem this module solves
+
+    // What's included
+    included: z.array(z.string()).default([]),
+
+    // Inputs needed from user
+    inputsNeeded: z.array(z.string()).default([]),
+
+    // Outputs/deliverables
+    outputs: z.array(z.string()).default([]),
+
+    // Process steps
+    processSteps: z.array(z.object({
+      step: z.number(),
+      title: z.string(),
+      description: z.string().optional()
+    })).default([]),
+
+    // FAQ items
+    faq: z.array(z.object({
+      question: z.string(),
+      answer: z.string()
+    })).default([]),
+
+    // Display order
     order: z.number().default(0),
+
+    // Status
     draft: z.boolean().default(false),
+    comingSoon: z.boolean().default(false),
+
+    // Metadata
     pubDate: z.coerce.date().optional(),
-    updatedDate: z.coerce.date().optional(),
-    image: z.string().optional(),
-    tags: z.array(z.string()).default([])
+    updatedDate: z.coerce.date().optional()
   })
 });
 
