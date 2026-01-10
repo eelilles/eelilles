@@ -1,18 +1,19 @@
 ---
-import PageLayout from '@layouts/PageLayout.astro';
+import BaseLayout from '@layouts/BaseLayout.astro';
 import Container from '@components/Container.astro';
 import Badge from '@components/Badge.astro';
+import Button from '@components/Button.astro';
+import Icon from '@components/Icon.astro';
+import Card from '@components/Card.astro';
 import { getCollection } from 'astro:content';
 import type { CollectionEntry } from 'astro:content';
 
 export async function getStaticPaths() {
   const resources = await getCollection('resources');
-  return resources
-    .filter((resource) => !resource.data.externalUrl)
-    .map((resource) => ({
-      params: { slug: resource.slug },
-      props: { resource }
-    }));
+  return resources.map((resource) => ({
+    params: { slug: resource.data.slug || resource.slug },
+    props: { resource }
+  }));
 }
 
 interface Props {
@@ -21,30 +22,218 @@ interface Props {
 
 const { resource } = Astro.props;
 const { Content } = await resource.render();
+
+// Category labels
+const categoryLabels: Record<string, string> = {
+  getting_started: 'Getting Started',
+  budget: 'Budget',
+  bidding: 'Bidding',
+  resilience: 'Resilience',
+  permitting: 'Permitting',
+  documentation: 'Documentation',
+  glossary: 'Glossary'
+};
+
+// Get related plans
+const allPlans = await getCollection('plans', ({ data }) => !data.draft);
+const relatedPlans = resource.data.relatedPlans.length > 0
+  ? allPlans.filter(p => resource.data.relatedPlans.includes(p.slug))
+  : [];
+
+// Get related modules
+const allModules = await getCollection('modules', ({ data }) => !data.draft);
+const relatedModules = resource.data.relatedModules.length > 0
+  ? allModules.filter(m => resource.data.relatedModules.includes(m.slug))
+  : [];
+
+// Get other resources in same category
+const allResources = await getCollection('resources', ({ data }) => !data.draft);
+const relatedResources = allResources
+  .filter(r => r.slug !== resource.slug && r.data.category === resource.data.category)
+  .slice(0, 3);
 ---
 
-<PageLayout title={resource.data.title} description={resource.data.description}>
-  <article class="py-16">
-    <Container size="md">
-      <header class="mb-12">
-        <h1 class="text-stone-900">{resource.data.title}</h1>
-        <p class="mt-4 text-lg text-stone-600">{resource.data.description}</p>
-        {resource.data.category && (
-          <div class="mt-6">
-            <Badge size="md">{resource.data.category}</Badge>
-          </div>
-        )}
-        {resource.data.tags && resource.data.tags.length > 0 && (
-          <div class="mt-4 flex flex-wrap gap-2">
-            {resource.data.tags.map((tag) => (
-              <Badge variant="outline">{tag}</Badge>
-            ))}
-          </div>
-        )}
-      </header>
-      <div class="prose max-w-none">
-        <Content />
+<BaseLayout
+  title={`${resource.data.title} | BuilderNest Resources`}
+  description={resource.data.summary}
+>
+  <!-- Breadcrumb -->
+  <section class="bg-cream-50 border-b border-stone-200 py-4">
+    <Container>
+      <nav class="flex items-center gap-2 text-sm text-stone-500">
+        <a href="/" class="hover:text-forest-600 transition-colors">Home</a>
+        <Icon name="chevron-right" size="sm" />
+        <a href="/resources" class="hover:text-forest-600 transition-colors">Resources</a>
+        <Icon name="chevron-right" size="sm" />
+        <span class="text-forest-900">{resource.data.title}</span>
+      </nav>
+    </Container>
+  </section>
+
+  <!-- Article Header -->
+  <section class="py-12 md:py-16 bg-white border-b border-stone-100">
+    <Container>
+      <div class="max-w-3xl">
+        <Badge variant="secondary" size="md" class="mb-4">
+          {categoryLabels[resource.data.category] || resource.data.category}
+        </Badge>
+
+        <h1 class="text-3xl md:text-4xl font-bold text-forest-900 mb-4">
+          {resource.data.title}
+        </h1>
+
+        <p class="text-lg text-stone-600 mb-6">
+          {resource.data.summary}
+        </p>
+
+        <div class="flex flex-wrap items-center gap-4 text-sm text-stone-500">
+          <span class="flex items-center gap-1">
+            <Icon name="clock" size="sm" />
+            {resource.data.readTime} min read
+          </span>
+          {resource.data.pubDate && (
+            <span class="flex items-center gap-1">
+              <Icon name="calendar" size="sm" />
+              {new Date(resource.data.pubDate).toLocaleDateString('en-CA', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+              })}
+            </span>
+          )}
+          {resource.data.downloadPdf && (
+            <a
+              href={resource.data.downloadPdf}
+              class="flex items-center gap-1 text-forest-600 hover:text-forest-700 transition-colors font-medium"
+            >
+              <Icon name="download" size="sm" />
+              Download PDF
+            </a>
+          )}
+        </div>
       </div>
     </Container>
-  </article>
-</PageLayout>
+  </section>
+
+  <!-- Article Content -->
+  <section class="py-12 md:py-16">
+    <Container>
+      <div class="grid lg:grid-cols-3 gap-12">
+        <!-- Main Content -->
+        <div class="lg:col-span-2">
+          <article class="prose prose-stone prose-lg max-w-none
+            prose-headings:text-forest-900 prose-headings:font-semibold
+            prose-a:text-forest-600 prose-a:no-underline hover:prose-a:underline
+            prose-strong:text-forest-900
+            prose-ul:my-4 prose-li:my-1
+            prose-img:rounded-lg prose-img:shadow-soft">
+            <Content />
+          </article>
+        </div>
+
+        <!-- Sidebar -->
+        <aside class="space-y-8">
+          <!-- Quick Actions -->
+          <div class="bg-cream-50 rounded-xl p-6">
+            <h3 class="text-lg font-semibold text-forest-900 mb-4">Quick Actions</h3>
+            <div class="space-y-3">
+              {resource.data.downloadPdf && (
+                <a
+                  href={resource.data.downloadPdf}
+                  class="flex items-center gap-3 text-forest-600 hover:text-forest-700 transition-colors"
+                >
+                  <div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-soft">
+                    <Icon name="download" size="md" />
+                  </div>
+                  <span class="font-medium">Download PDF</span>
+                </a>
+              )}
+              <button
+                onclick="window.print()"
+                class="flex items-center gap-3 text-stone-600 hover:text-forest-600 transition-colors w-full"
+              >
+                <div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-soft">
+                  <Icon name="document" size="md" />
+                </div>
+                <span class="font-medium">Print this guide</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Related Plans -->
+          {relatedPlans.length > 0 && (
+            <div class="bg-white rounded-xl border border-stone-200 p-6">
+              <h3 class="text-lg font-semibold text-forest-900 mb-4">Related Plans</h3>
+              <ul class="space-y-3">
+                {relatedPlans.map(plan => (
+                  <li>
+                    <a
+                      href={`/plans/${plan.data.slug || plan.slug}`}
+                      class="flex items-center gap-3 text-stone-600 hover:text-forest-600 transition-colors"
+                    >
+                      <Icon name="home" size="sm" />
+                      <span>{plan.data.name}</span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          <!-- Related Modules -->
+          {relatedModules.length > 0 && (
+            <div class="bg-white rounded-xl border border-stone-200 p-6">
+              <h3 class="text-lg font-semibold text-forest-900 mb-4">Related Modules</h3>
+              <ul class="space-y-3">
+                {relatedModules.map(mod => (
+                  <li>
+                    <a
+                      href={`/modules/${mod.data.slug || mod.slug}`}
+                      class="flex items-center gap-3 text-stone-600 hover:text-forest-600 transition-colors"
+                    >
+                      <Icon name={mod.data.icon} size="sm" />
+                      <span>{mod.data.name}</span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          <!-- More Resources -->
+          {relatedResources.length > 0 && (
+            <div class="bg-white rounded-xl border border-stone-200 p-6">
+              <h3 class="text-lg font-semibold text-forest-900 mb-4">More in {categoryLabels[resource.data.category]}</h3>
+              <ul class="space-y-3">
+                {relatedResources.map(res => (
+                  <li>
+                    <a
+                      href={`/resources/${res.data.slug || res.slug}`}
+                      class="flex items-center gap-3 text-stone-600 hover:text-forest-600 transition-colors"
+                    >
+                      <Icon name="book-open" size="sm" />
+                      <span>{res.data.title}</span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </aside>
+      </div>
+    </Container>
+  </section>
+
+  <!-- Back to Resources -->
+  <section class="py-8 border-t border-stone-100">
+    <Container>
+      <a
+        href="/resources"
+        class="inline-flex items-center gap-2 text-forest-600 hover:text-forest-700 transition-colors font-medium"
+      >
+        <Icon name="arrow-left" size="sm" />
+        Back to all resources
+      </a>
+    </Container>
+  </section>
+</BaseLayout>

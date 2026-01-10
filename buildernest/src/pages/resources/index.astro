@@ -1,44 +1,189 @@
 ---
-import PageLayout from '@layouts/PageLayout.astro';
+import BaseLayout from '@layouts/BaseLayout.astro';
 import Container from '@components/Container.astro';
-import Card from '@components/Card.astro';
 import Badge from '@components/Badge.astro';
+import CTABand from '@components/CTABand.astro';
+import Icon from '@components/Icon.astro';
 import { getCollection } from 'astro:content';
 
-const resources = await getCollection('resources', ({ data }) => !data.draft);
+const allResources = await getCollection('resources', ({ data }) => !data.draft);
+
+// Sort by featured first, then by title
+const resources = allResources.sort((a, b) => {
+  if (a.data.featured && !b.data.featured) return -1;
+  if (!a.data.featured && b.data.featured) return 1;
+  return a.data.title.localeCompare(b.data.title);
+});
+
+// Category labels
+const categoryLabels: Record<string, string> = {
+  getting_started: 'Getting Started',
+  budget: 'Budget',
+  bidding: 'Bidding',
+  resilience: 'Resilience',
+  permitting: 'Permitting',
+  documentation: 'Documentation',
+  glossary: 'Glossary'
+};
+
+// Get unique categories from resources
+const categories = [...new Set(resources.map(r => r.data.category))];
 ---
 
-<PageLayout
-  title="Resources"
-  description="Helpful resources for building in northern BC"
-  heroTitle="Resources"
-  heroSubtitle="Helpful guides and resources for building in northern BC"
+<BaseLayout
+  title="Resources | BuilderNest"
+  description="Free guides, checklists, and resources to help you navigate your self-build project in northern BC."
 >
-  <section class="py-12 md:py-16">
+  <!-- Hero -->
+  <section class="bg-forest-900 text-white py-16 md:py-20">
     <Container>
-      {resources.length > 0 ? (
-        <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {resources.map((resource) => (
-            <Card
-              href={resource.data.externalUrl || `/resources/${resource.slug}`}
-              {...(resource.data.externalUrl && {
-                target: '_blank',
-                rel: 'noopener noreferrer'
-              })}
-            >
-              <h3 class="text-stone-900">{resource.data.title}</h3>
-              <p class="mt-2 text-sm text-stone-600">{resource.data.description}</p>
-              {resource.data.category && (
-                <div class="mt-4">
-                  <Badge>{resource.data.category}</Badge>
-                </div>
-              )}
-            </Card>
-          ))}
-        </div>
-      ) : (
-        <p class="text-stone-500">No resources available yet.</p>
-      )}
+      <div class="max-w-3xl">
+        <h1 class="text-4xl md:text-5xl font-bold mb-4">Resources</h1>
+        <p class="text-xl text-forest-100">
+          Free guides and checklists to help you navigate your self-build project with confidence.
+        </p>
+      </div>
     </Container>
   </section>
-</PageLayout>
+
+  <!-- Category Filters -->
+  <section class="bg-cream-50 border-b border-stone-200 sticky top-0 z-10">
+    <Container>
+      <div class="py-4 overflow-x-auto">
+        <div class="flex gap-2 min-w-max" id="category-filters">
+          <button
+            class="category-btn px-4 py-2 rounded-full text-sm font-medium transition-colors bg-forest-600 text-white"
+            data-category="all"
+          >
+            All Resources
+          </button>
+          {categories.map(category => (
+            <button
+              class="category-btn px-4 py-2 rounded-full text-sm font-medium transition-colors bg-white text-stone-600 hover:bg-stone-100"
+              data-category={category}
+            >
+              {categoryLabels[category] || category}
+            </button>
+          ))}
+        </div>
+      </div>
+    </Container>
+  </section>
+
+  <!-- Resources Grid -->
+  <section class="py-16 md:py-20">
+    <Container>
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6" id="resources-grid">
+        {resources.map((resource) => {
+          const slug = resource.data.slug || resource.slug;
+          return (
+            <article
+              class="resource-card bg-white rounded-xl shadow-soft hover:shadow-lifted transition-shadow p-6 flex flex-col"
+              data-category={resource.data.category}
+            >
+              <div class="flex items-start justify-between gap-4 mb-4">
+                <Badge variant="secondary" size="sm">
+                  {categoryLabels[resource.data.category] || resource.data.category}
+                </Badge>
+                <span class="text-sm text-stone-500 flex items-center gap-1 shrink-0">
+                  <Icon name="clock" size="sm" />
+                  {resource.data.readTime} min read
+                </span>
+              </div>
+
+              <h3 class="text-lg font-semibold text-forest-900 mb-2">
+                <a href={`/resources/${slug}`} class="hover:text-forest-600 transition-colors">
+                  {resource.data.title}
+                </a>
+              </h3>
+
+              <p class="text-stone-600 text-sm mb-4 flex-grow">
+                {resource.data.summary}
+              </p>
+
+              <div class="flex items-center justify-between pt-4 border-t border-stone-100">
+                <a
+                  href={`/resources/${slug}`}
+                  class="text-forest-600 font-medium text-sm hover:text-forest-700 transition-colors inline-flex items-center gap-1"
+                >
+                  Read guide
+                  <Icon name="arrow-right" size="sm" />
+                </a>
+                {resource.data.downloadPdf && (
+                  <a
+                    href={resource.data.downloadPdf}
+                    class="text-stone-500 hover:text-forest-600 transition-colors"
+                    title="Download PDF"
+                  >
+                    <Icon name="download" size="sm" />
+                  </a>
+                )}
+              </div>
+            </article>
+          );
+        })}
+      </div>
+
+      <!-- Empty State -->
+      <div id="empty-state" class="hidden text-center py-12">
+        <div class="w-16 h-16 bg-stone-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <Icon name="book-open" size="lg" />
+        </div>
+        <h3 class="text-lg font-semibold text-forest-900 mb-2">No resources found</h3>
+        <p class="text-stone-600">Try selecting a different category.</p>
+      </div>
+    </Container>
+  </section>
+
+  <!-- CTA Band -->
+  <CTABand
+    heading="Need personalized guidance?"
+    description="Our modules provide structured support throughout your build journey."
+    primaryButtonText="Explore Modules"
+    primaryButtonHref="/modules"
+    secondaryButtonText="Contact Us"
+    secondaryButtonHref="/contact"
+  />
+</BaseLayout>
+
+<script>
+  // Category filter functionality
+  const filterButtons = document.querySelectorAll('.category-btn');
+  const resourceCards = document.querySelectorAll('.resource-card');
+  const emptyState = document.getElementById('empty-state');
+
+  filterButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      const category = button.getAttribute('data-category');
+
+      // Update button styles
+      filterButtons.forEach(btn => {
+        btn.classList.remove('bg-forest-600', 'text-white');
+        btn.classList.add('bg-white', 'text-stone-600', 'hover:bg-stone-100');
+      });
+      button.classList.remove('bg-white', 'text-stone-600', 'hover:bg-stone-100');
+      button.classList.add('bg-forest-600', 'text-white');
+
+      // Filter cards
+      let visibleCount = 0;
+      resourceCards.forEach(card => {
+        const cardCategory = card.getAttribute('data-category');
+        if (category === 'all' || cardCategory === category) {
+          card.classList.remove('hidden');
+          visibleCount++;
+        } else {
+          card.classList.add('hidden');
+        }
+      });
+
+      // Show/hide empty state
+      if (emptyState) {
+        if (visibleCount === 0) {
+          emptyState.classList.remove('hidden');
+        } else {
+          emptyState.classList.add('hidden');
+        }
+      }
+    });
+  });
+</script>

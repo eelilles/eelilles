@@ -12,6 +12,17 @@ const climateEnum = z.enum(['coastal', 'interior', 'northern', 'alpine']);
 // Resilience tiers
 const resilienceEnum = z.enum(['baseline', 'enhanced', 'resilient_plus']);
 
+// Resource categories
+const resourceCategoryEnum = z.enum([
+  'getting_started',
+  'budget',
+  'bidding',
+  'resilience',
+  'permitting',
+  'documentation',
+  'glossary'
+]);
+
 const plans = defineCollection({
   type: 'content',
   schema: z.object({
@@ -71,11 +82,11 @@ const modules = defineCollection({
     // Basic info
     name: z.string(),
     slug: z.string().optional(),
-    icon: z.string(), // Icon component name (e.g., 'document', 'cube', 'bolt')
-    summary: z.string(), // One-line summary
+    icon: z.string(),
+    summary: z.string(),
 
     // Problem/solution framing
-    problem: z.string(), // The problem this module solves
+    problem: z.string(),
 
     // What's included
     included: z.array(z.string()).default([]),
@@ -115,14 +126,29 @@ const modules = defineCollection({
 const resources = defineCollection({
   type: 'content',
   schema: z.object({
+    // Basic info
     title: z.string(),
-    description: z.string(),
-    category: z.string().optional(),
+    slug: z.string().optional(),
+    category: resourceCategoryEnum,
+    summary: z.string(), // 2-3 sentences
+
+    // Reading info
+    readTime: z.number().min(1).max(60), // minutes
+
+    // Downloads
+    downloadPdf: z.string().optional(), // file path
+
+    // Related content
+    relatedPlans: z.array(z.string()).default([]), // plan slugs
+    relatedModules: z.array(z.string()).default([]), // module slugs
+
+    // Status
     draft: z.boolean().default(false),
+    featured: z.boolean().default(false),
+
+    // Metadata
     pubDate: z.coerce.date().optional(),
-    updatedDate: z.coerce.date().optional(),
-    externalUrl: z.string().url().optional(),
-    tags: z.array(z.string()).default([])
+    updatedDate: z.coerce.date().optional()
   })
 });
 
@@ -137,3 +163,4 @@ export type PlanType = z.infer<typeof planTypeEnum>;
 export type FoundationType = z.infer<typeof foundationEnum>;
 export type ClimateType = z.infer<typeof climateEnum>;
 export type ResilienceType = z.infer<typeof resilienceEnum>;
+export type ResourceCategory = z.infer<typeof resourceCategoryEnum>;
