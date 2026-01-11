@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../config/constants.dart';
 import '../config/theme.dart';
+import '../models/models.dart';
 import '../providers/providers.dart';
 import '../widgets/grade_display.dart';
 import 'calibration_screen.dart';

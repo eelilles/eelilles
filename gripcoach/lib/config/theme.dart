@@ -58,7 +58,7 @@ class GripCoachTheme {
         elevation: 0,
         centerTitle: true,
       ),
-      cardTheme: const CardTheme(
+      cardTheme: const CardThemeData(
         color: cardColor,
         elevation: 4,
         margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
