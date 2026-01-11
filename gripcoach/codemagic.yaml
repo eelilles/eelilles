@@ -1,39 +1,48 @@
 workflows:
-  ios-workflow:
-    name: iOS Build
+  ios-release:
+    name: iOS Release to TestFlight
     max_build_duration: 60
     instance_type: mac_mini_m1
+    integrations:
+      app_store_connect: codemagic
     environment:
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.gripcoach.app
       flutter: stable
       xcode: latest
+      cocoapods: default
     scripts:
-      - name: Set up local properties
+      - name: Set up code signing
+        script: |
+          keychain initialize
+      - name: Fetch signing files
+        script: |
+          app-store-connect fetch-signing-files $(xcode-project detect-bundle-id) --type IOS_APP_STORE
+      - name: Use signing profiles
+        script: |
+          keychain add-certificates
+      - name: Set up Xcode project settings
+        script: |
+          cd gripcoach
+          xcode-project use-profiles
+      - name: Get Flutter dependencies
         script: |
           cd gripcoach
           flutter pub get
+      - name: Install CocoaPods
+        script: |
+          cd gripcoach/ios
+          pod install
       - name: Build iOS
         script: |
           cd gripcoach
-          flutter build ios --release --no-codesign
+          flutter build ipa --release --export-options-plist=/Users/builder/export_options.plist
     artifacts:
       - gripcoach/build/ios/ipa/*.ipa
-      - gripcoach/build/ios/archive/*.xcarchive
-
-  ios-simulator:
-    name: iOS Simulator Build
-    max_build_duration: 60
-    instance_type: mac_mini_m1
-    environment:
-      flutter: stable
-      xcode: latest
-    scripts:
-      - name: Get dependencies
-        script: |
-          cd gripcoach
-          flutter pub get
-      - name: Build for Simulator
-        script: |
-          cd gripcoach
-          flutter build ios --debug --simulator
-    artifacts:
-      - gripcoach/build/ios/iphonesimulator/*.app
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
+        beta_groups:
+          - GripCoach Testers
