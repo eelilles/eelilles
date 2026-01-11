@@ -1,0 +1,39 @@
+workflows:
+  ios-workflow:
+    name: iOS Build
+    max_build_duration: 60
+    instance_type: mac_mini_m1
+    environment:
+      flutter: stable
+      xcode: latest
+    scripts:
+      - name: Set up local properties
+        script: |
+          cd gripcoach
+          flutter pub get
+      - name: Build iOS
+        script: |
+          cd gripcoach
+          flutter build ios --release --no-codesign
+    artifacts:
+      - gripcoach/build/ios/ipa/*.ipa
+      - gripcoach/build/ios/archive/*.xcarchive
+
+  ios-simulator:
+    name: iOS Simulator Build
+    max_build_duration: 60
+    instance_type: mac_mini_m1
+    environment:
+      flutter: stable
+      xcode: latest
+    scripts:
+      - name: Get dependencies
+        script: |
+          cd gripcoach
+          flutter pub get
+      - name: Build for Simulator
+        script: |
+          cd gripcoach
+          flutter build ios --debug --simulator
+    artifacts:
+      - gripcoach/build/ios/iphonesimulator/*.app
